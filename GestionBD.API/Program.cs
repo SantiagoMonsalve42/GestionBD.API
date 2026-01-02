@@ -1,21 +1,36 @@
 using GestionBD.Infraestructure.Data;
+using GestionBD.API.Extensions;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
+using Microsoft.Data.SqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Registrar DbContext con la cadena de conexión desde appsettings.json
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IDbConnection>(sp =>
+    new SqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssemblies(typeof(Program).Assembly, 
+                                       typeof(GestionBD.Application.AssemblyReference).Assembly));
+
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "GestionBD API",
+        Version = "v1",
+        Description = "API para gestión de bases de datos con CQRS"
+    });
+});
 
 var app = builder.Build();
+app.UseExceptionHandling();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
