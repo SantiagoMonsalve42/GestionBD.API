@@ -46,6 +46,7 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("tbl_Artefactos");
 
             entity.Property(e => e.IdArtefacto)
+                .ValueGeneratedOnAdd()
                 .HasColumnType("numeric(18, 0)")
                 .HasColumnName("idArtefacto");
             entity.Property(e => e.Codificacion)
