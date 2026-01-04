@@ -21,10 +21,7 @@ public sealed class UpdateEjecucionCommandHandler : IRequestHandler<UpdateEjecuc
             throw new KeyNotFoundException($"Ejecución con ID {command.Request.IdEjecucion} no encontrada.");
 
         ejecucion.IdInstancia = command.Request.IdInstancia;
-        ejecucion.HoraInicioEjecucion = command.Request.HoraInicioEjecucion;
-        ejecucion.HoraFinEjecucion = command.Request.HoraFinEjecucion;
         ejecucion.Descripcion = command.Request.Descripcion;
-        ejecucion.NombreRequerimiento = command.Request.NombreRequerimiento;
 
         _unitOfWork.Ejecuciones.Update(ejecucion);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

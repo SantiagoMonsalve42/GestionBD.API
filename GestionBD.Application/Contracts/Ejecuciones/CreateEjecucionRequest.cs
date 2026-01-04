@@ -6,10 +6,6 @@ public sealed record CreateEjecucionRequest(
     [Required]
     decimal IdInstancia,
     
-    DateTime? HoraInicioEjecucion,
-    
-    DateTime? HoraFinEjecucion,
-    
     [MaxLength(150, ErrorMessage = "La descripción no puede exceder 150 caracteres")]
     string? Descripcion,
 

@@ -14,6 +14,24 @@ public sealed class EjecucionReadRepository : IEjecucionReadRepository
         _connection = connection;
     }
 
+    public async Task<bool> ExistsByReqName(string reqName, CancellationToken cancellationToken = default)
+    {
+        const string sql = """
+            SELECT 
+                e.idEjecucion AS IdEjecucion,
+                e.idInstancia AS IdInstancia,
+                e.horaInicioEjecucion AS HoraInicioEjecucion,
+                e.horaFinEjecucion AS HoraFinEjecucion,
+                e.descripcion AS Descripcion,
+                e.nombreRequerimiento AS NombreRequerimiento
+            FROM dbo.tbl_Ejecuciones e
+            WHERE e.nombreRequerimiento = @ReqName;
+            """;
+
+        var result = await _connection.ExecuteScalarAsync<bool>(sql, new { ReqName = reqName });
+        return result;
+    }
+
     public async Task<IEnumerable<EjecucionResponse>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         const string sql = """
