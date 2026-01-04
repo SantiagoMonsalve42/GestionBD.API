@@ -1,32 +1,20 @@
-using MediatR;
+using GestionBD.Application.Abstractions;
 using GestionBD.Application.Contracts.Motores;
-using System.Data;
-using Dapper;
+using MediatR;
 
 namespace GestionBD.Application.Motores.Queries;
 
 public sealed class GetMotorByIdQueryHandler : IRequestHandler<GetMotorByIdQuery, MotorResponse?>
 {
-    private readonly IDbConnection _connection;
+    private readonly IMotorReadRepository _repository;
 
-    public GetMotorByIdQueryHandler(IDbConnection connection)
+    public GetMotorByIdQueryHandler(IMotorReadRepository repository)
     {
-        _connection = connection;
+        _repository = repository;
     }
 
     public async Task<MotorResponse?> Handle(GetMotorByIdQuery request, CancellationToken cancellationToken)
     {
-        const string sql = """
-            SELECT 
-                idMotor AS IdMotor,
-                nombreMotor AS NombreMotor,
-                versionMotor AS VersionMotor,
-                descripcionMotor AS DescripcionMotor
-            FROM dbo.tbl_Motores
-            WHERE idMotor = @IdMotor;
-            """;
-
-        var motor = await _connection.QuerySingleOrDefaultAsync<MotorResponse>(sql, new { request.IdMotor });
-        return motor;
+        return await _repository.GetByIdAsync(request.IdMotor, cancellationToken);
     }
 }

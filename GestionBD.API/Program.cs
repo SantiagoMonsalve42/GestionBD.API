@@ -5,6 +5,8 @@ using System.Data;
 using Microsoft.Data.SqlClient;
 using GestionBD.Domain;
 using GestionBD.Infraestructure;
+using GestionBD.Application.Abstractions;
+using GestionBD.Infraestructure.Repositories.Query;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,16 @@ builder.Services.AddScoped<IDbConnection>(sp =>
 
 // Unit of Work (para Commands)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Read Repositories (para Queries - Dapper)
+builder.Services.AddScoped<IArtefactoReadRepository, ArtefactoReadRepository>();
+builder.Services.AddScoped<IEntregableReadRepository, EntregableReadRepository>();
+builder.Services.AddScoped<IEjecucionReadRepository, EjecucionReadRepository>();
+builder.Services.AddScoped<IInstanciaReadRepository, InstanciaReadRepository>();
+builder.Services.AddScoped<IMotorReadRepository, MotorReadRepository>();
+builder.Services.AddScoped<ILogEventoReadRepository, LogEventoReadRepository>();
+builder.Services.AddScoped<ILogTransaccionReadRepository, LogTransaccionReadRepository>();
+builder.Services.AddScoped<IParametroReadRepository, ParametroReadRepository>();
 
 // MediatR (CQRS)
 builder.Services.AddMediatR(cfg =>
@@ -39,11 +51,8 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 app.UseExceptionHandling();
 
-//Corregir en ambiente productivo
 app.UseSwagger();
 app.UseSwaggerUI();
-
-//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

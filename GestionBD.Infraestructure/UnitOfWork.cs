@@ -2,6 +2,7 @@
 using GestionBD.Domain.Repositories;
 using GestionBD.Infraestructure.Data;
 using GestionBD.Infraestructure.Repositories;
+using GestionBD.Infraestructure.Repositories.Command;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace GestionBD.Infraestructure;
