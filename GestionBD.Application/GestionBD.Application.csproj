@@ -15,9 +15,4 @@
     <ProjectReference Include="..\GestionBD.Infraestructure\GestionBD.Infraestructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Contracts\UseCases\" />
-    <Folder Include="UseCases\" />
-  </ItemGroup>
-
 </Project>
