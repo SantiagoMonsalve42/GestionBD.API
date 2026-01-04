@@ -1,22 +1,21 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using Microsoft.EntityFrameworkCore;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.LogTransacciones.Commands;
 
 public sealed class UpdateLogTransaccionCommandHandler : IRequestHandler<UpdateLogTransaccionCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateLogTransaccionCommandHandler(ApplicationDbContext context)
+    public UpdateLogTransaccionCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(UpdateLogTransaccionCommand command, CancellationToken cancellationToken)
     {
-        var logTransaccion = await _context.TblLogTransacciones
-            .FirstOrDefaultAsync(lt => lt.IdTransaccion == command.Request.IdTransaccion, cancellationToken);
+        var logTransaccion = await _unitOfWork.FindEntityAsync<TblLogTransaccione>(command.Request.IdTransaccion, cancellationToken);
 
         if (logTransaccion == null)
             throw new KeyNotFoundException($"Log de transacción con ID {command.Request.IdTransaccion} no encontrado.");
@@ -29,7 +28,8 @@ public sealed class UpdateLogTransaccionCommandHandler : IRequestHandler<UpdateL
         logTransaccion.FechaFin = command.Request.FechaFin;
         logTransaccion.UsuarioEjecucion = command.Request.UsuarioEjecucion;
 
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.LogTransacciones.Update(logTransaccion);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }

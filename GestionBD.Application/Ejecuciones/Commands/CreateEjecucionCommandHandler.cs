@@ -1,16 +1,16 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using GestionBD.Infraestructure.Data.Entities;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.Ejecuciones.Commands;
 
 public sealed class CreateEjecucionCommandHandler : IRequestHandler<CreateEjecucionCommand, decimal>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateEjecucionCommandHandler(ApplicationDbContext context)
+    public CreateEjecucionCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<decimal> Handle(CreateEjecucionCommand command, CancellationToken cancellationToken)
@@ -23,8 +23,8 @@ public sealed class CreateEjecucionCommandHandler : IRequestHandler<CreateEjecuc
             Descripcion = command.Request.Descripcion
         };
 
-        _context.TblEjecuciones.Add(ejecucion);
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.Ejecuciones.Add(ejecucion);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ejecucion.IdEjecucion;
     }

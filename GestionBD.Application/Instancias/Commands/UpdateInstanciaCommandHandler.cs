@@ -1,22 +1,21 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using Microsoft.EntityFrameworkCore;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.Instancias.Commands;
 
 public sealed class UpdateInstanciaCommandHandler : IRequestHandler<UpdateInstanciaCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateInstanciaCommandHandler(ApplicationDbContext context)
+    public UpdateInstanciaCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(UpdateInstanciaCommand command, CancellationToken cancellationToken)
     {
-        var instancia = await _context.TblInstancias
-            .FirstOrDefaultAsync(i => i.IdInstancia == command.Request.IdInstancia, cancellationToken);
+        var instancia = await _unitOfWork.FindEntityAsync<TblInstancia>(command.Request.IdInstancia, cancellationToken);
 
         if (instancia == null)
             throw new KeyNotFoundException($"Instancia con ID {command.Request.IdInstancia} no encontrada.");
@@ -27,7 +26,8 @@ public sealed class UpdateInstanciaCommandHandler : IRequestHandler<UpdateInstan
         instancia.Usuario = command.Request.Usuario;
         instancia.Password = command.Request.Password;
 
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.Instancias.Update(instancia);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }

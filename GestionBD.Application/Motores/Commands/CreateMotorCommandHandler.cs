@@ -1,16 +1,16 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using GestionBD.Infraestructure.Data.Entities;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.Motores.Commands;
 
 public sealed class CreateMotorCommandHandler : IRequestHandler<CreateMotorCommand, decimal>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateMotorCommandHandler(ApplicationDbContext context)
+    public CreateMotorCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<decimal> Handle(CreateMotorCommand command, CancellationToken cancellationToken)
@@ -22,8 +22,8 @@ public sealed class CreateMotorCommandHandler : IRequestHandler<CreateMotorComma
             VersionMotor = command.Request.VersionMotor ?? string.Empty
         };
 
-        _context.TblMotores.Add(motor);
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.Motores.Add(motor);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return motor.IdMotor;
     }

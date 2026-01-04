@@ -1,30 +1,29 @@
-using MediatR;
-using GestionBD.Infraestructure.Data;
-using GestionBD.Infraestructure.Data.Entities;
+    using MediatR;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.Parametros.Commands;
 
 public sealed class CreateParametroCommandHandler : IRequestHandler<CreateParametroCommand, decimal>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateParametroCommandHandler(ApplicationDbContext context)
+    public CreateParametroCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<decimal> Handle(CreateParametroCommand command, CancellationToken cancellationToken)
     {
         var parametro = new TblParametro
         {
-            IdParametro = command.Request.IdParametro,
             NombreParametro = command.Request.NombreParametro,
             ValorNumerico = command.Request.ValorNumerico,
             ValorString = command.Request.ValorString
         };
 
-        _context.TblParametros.Add(parametro);
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.Parametros.Add(parametro);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return parametro.IdParametro;
     }

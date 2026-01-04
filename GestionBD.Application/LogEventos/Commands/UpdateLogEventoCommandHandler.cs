@@ -1,22 +1,21 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using Microsoft.EntityFrameworkCore;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.LogEventos.Commands;
 
 public sealed class UpdateLogEventoCommandHandler : IRequestHandler<UpdateLogEventoCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateLogEventoCommandHandler(ApplicationDbContext context)
+    public UpdateLogEventoCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(UpdateLogEventoCommand command, CancellationToken cancellationToken)
     {
-        var logEvento = await _context.TblLogEventos
-            .FirstOrDefaultAsync(le => le.IdEvento == command.Request.IdEvento, cancellationToken);
+        var logEvento = await _unitOfWork.FindEntityAsync<TblLogEvento>(command.Request.IdEvento, cancellationToken);
 
         if (logEvento == null)
             throw new KeyNotFoundException($"Log de evento con ID {command.Request.IdEvento} no encontrado.");
@@ -26,7 +25,8 @@ public sealed class UpdateLogEventoCommandHandler : IRequestHandler<UpdateLogEve
         logEvento.Descripcion = command.Request.Descripcion;
         logEvento.EstadoEvento = command.Request.EstadoEvento;
 
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.LogEventos.Update(logEvento);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }

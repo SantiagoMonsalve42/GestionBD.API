@@ -18,4 +18,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GestionBD.Domain\GestionBD.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -3,15 +3,23 @@ using GestionBD.API.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using GestionBD.Domain;
+using GestionBD.Infraestructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// DbContext para Commands (EF Core)
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// IDbConnection para Queries (Dapper)
 builder.Services.AddScoped<IDbConnection>(sp =>
     new SqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Unit of Work (para Commands)
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// MediatR (CQRS)
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblies(typeof(Program).Assembly, 
                                        typeof(GestionBD.Application.AssemblyReference).Assembly));

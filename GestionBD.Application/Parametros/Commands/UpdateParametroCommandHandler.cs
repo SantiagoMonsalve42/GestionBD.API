@@ -1,22 +1,21 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using Microsoft.EntityFrameworkCore;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.Parametros.Commands;
 
 public sealed class UpdateParametroCommandHandler : IRequestHandler<UpdateParametroCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateParametroCommandHandler(ApplicationDbContext context)
+    public UpdateParametroCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(UpdateParametroCommand command, CancellationToken cancellationToken)
     {
-        var parametro = await _context.TblParametros
-            .FirstOrDefaultAsync(p => p.IdParametro == command.Request.IdParametro, cancellationToken);
+        var parametro = await _unitOfWork.FindEntityAsync<TblParametro>(command.Request.IdParametro, cancellationToken);
 
         if (parametro == null)
             throw new KeyNotFoundException($"Parámetro con ID {command.Request.IdParametro} no encontrado.");
@@ -25,7 +24,8 @@ public sealed class UpdateParametroCommandHandler : IRequestHandler<UpdateParame
         parametro.ValorNumerico = command.Request.ValorNumerico;
         parametro.ValorString = command.Request.ValorString;
 
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.Parametros.Update(parametro);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }

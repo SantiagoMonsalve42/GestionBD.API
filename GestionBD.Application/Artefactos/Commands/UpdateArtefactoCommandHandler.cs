@@ -1,22 +1,21 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using Microsoft.EntityFrameworkCore;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.Artefactos.Commands;
 
 public sealed class UpdateArtefactoCommandHandler : IRequestHandler<UpdateArtefactoCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateArtefactoCommandHandler(ApplicationDbContext context)
+    public UpdateArtefactoCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(UpdateArtefactoCommand command, CancellationToken cancellationToken)
     {
-        var artefacto = await _context.TblArtefactos
-            .FirstOrDefaultAsync(a => a.IdArtefacto == command.Request.IdArtefacto, cancellationToken);
+        var artefacto = await _unitOfWork.FindEntityAsync<TblArtefacto>(command.Request.IdArtefacto, cancellationToken);
 
         if (artefacto == null)
             throw new KeyNotFoundException($"Artefacto con ID {command.Request.IdArtefacto} no encontrado.");
@@ -28,7 +27,8 @@ public sealed class UpdateArtefactoCommandHandler : IRequestHandler<UpdateArtefa
         artefacto.RutaRelativa = command.Request.RutaRelativa;
         artefacto.EsReverso = command.Request.EsReverso;
 
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.Artefactos.Update(artefacto);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }

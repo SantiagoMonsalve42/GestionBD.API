@@ -1,22 +1,21 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using Microsoft.EntityFrameworkCore;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.Ejecuciones.Commands;
 
 public sealed class UpdateEjecucionCommandHandler : IRequestHandler<UpdateEjecucionCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateEjecucionCommandHandler(ApplicationDbContext context)
+    public UpdateEjecucionCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(UpdateEjecucionCommand command, CancellationToken cancellationToken)
     {
-        var ejecucion = await _context.TblEjecuciones
-            .FirstOrDefaultAsync(e => e.IdEjecucion == command.Request.IdEjecucion, cancellationToken);
+        var ejecucion = await _unitOfWork.FindEntityAsync<TblEjecucione>(command.Request.IdEjecucion, cancellationToken);
 
         if (ejecucion == null)
             throw new KeyNotFoundException($"Ejecución con ID {command.Request.IdEjecucion} no encontrada.");
@@ -26,7 +25,8 @@ public sealed class UpdateEjecucionCommandHandler : IRequestHandler<UpdateEjecuc
         ejecucion.HoraFinEjecucion = command.Request.HoraFinEjecucion;
         ejecucion.Descripcion = command.Request.Descripcion;
 
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.Ejecuciones.Update(ejecucion);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }

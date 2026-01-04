@@ -1,28 +1,27 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using Microsoft.EntityFrameworkCore;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.LogTransacciones.Commands;
 
 public sealed class DeleteLogTransaccionCommandHandler : IRequestHandler<DeleteLogTransaccionCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteLogTransaccionCommandHandler(ApplicationDbContext context)
+    public DeleteLogTransaccionCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(DeleteLogTransaccionCommand command, CancellationToken cancellationToken)
     {
-        var logTransaccion = await _context.TblLogTransacciones
-            .FirstOrDefaultAsync(lt => lt.IdTransaccion == command.IdTransaccion, cancellationToken);
+        var logTransaccion = await _unitOfWork.FindEntityAsync<TblLogTransaccione>(command.IdTransaccion, cancellationToken);
 
         if (logTransaccion == null)
             throw new KeyNotFoundException($"Log de transacción con ID {command.IdTransaccion} no encontrado.");
 
-        _context.TblLogTransacciones.Remove(logTransaccion);
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.LogTransacciones.Remove(logTransaccion);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }

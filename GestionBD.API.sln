@@ -10,6 +10,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionBD.Domain.ExternalServices", "GestionBD.Domain.ExternalServices\GestionBD.Domain.ExternalServices.csproj", "{015688CF-83C5-4A59-8DAF-66A3963B146F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionBD.Infraestructure", "GestionBD.Infraestructure\GestionBD.Infraestructure.csproj", "{6B63702B-B3FD-4962-B7C1-0F8CA2D66E74}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C81CD00A-C521-4783-A402-3AAB0BFC874E} = {C81CD00A-C521-4783-A402-3AAB0BFC874E}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionBD.Infraestructure.ExternalServices", "GestionBD.Infraestructure.ExternalServices\GestionBD.Infraestructure.ExternalServices.csproj", "{CF3B9008-7F6E-4B07-B375-E4F94A76FA1E}"
 EndProject

@@ -1,4 +1,4 @@
-﻿
+﻿using GestionBD.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace GestionBD.Infraestructure.Data;
@@ -15,19 +15,12 @@ public partial class ApplicationDbContext : DbContext
     }
 
     public virtual DbSet<TblArtefacto> TblArtefactos { get; set; }
-
     public virtual DbSet<TblEjecucione> TblEjecuciones { get; set; }
-
     public virtual DbSet<TblEntregable> TblEntregables { get; set; }
-
     public virtual DbSet<TblInstancia> TblInstancias { get; set; }
-
     public virtual DbSet<TblLogEvento> TblLogEventos { get; set; }
-
     public virtual DbSet<TblLogTransaccione> TblLogTransacciones { get; set; }
-
     public virtual DbSet<TblMotore> TblMotores { get; set; }
-
     public virtual DbSet<TblParametro> TblParametros { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -40,7 +33,6 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<TblArtefacto>(entity =>
         {
             entity.HasKey(e => e.IdArtefacto);
-
             entity.ToTable("tbl_Artefactos");
 
             entity.Property(e => e.IdArtefacto)
@@ -74,7 +66,6 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<TblEjecucione>(entity =>
         {
             entity.HasKey(e => e.IdEjecucion).HasName("PK_tbl_Ejecuciones_1");
-
             entity.ToTable("tbl_Ejecuciones");
 
             entity.Property(e => e.IdEjecucion)
@@ -104,7 +95,6 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<TblEntregable>(entity =>
         {
             entity.HasKey(e => e.IdEntregable);
-
             entity.ToTable("tbl_Entregables");
 
             entity.Property(e => e.IdEntregable)
@@ -132,7 +122,6 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<TblInstancia>(entity =>
         {
             entity.HasKey(e => e.IdInstancia);
-
             entity.ToTable("tbl_Instancias");
 
             entity.Property(e => e.IdInstancia)
@@ -165,7 +154,6 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<TblLogEvento>(entity =>
         {
             entity.HasKey(e => e.IdEvento);
-
             entity.ToTable("tbl_logEventos");
 
             entity.Property(e => e.IdEvento)
@@ -194,7 +182,6 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<TblLogTransaccione>(entity =>
         {
             entity.HasKey(e => e.IdTransaccion);
-
             entity.ToTable("tbl_logTransacciones");
 
             entity.Property(e => e.IdTransaccion)
@@ -233,7 +220,6 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<TblMotore>(entity =>
         {
             entity.HasKey(e => e.IdMotor);
-
             entity.ToTable("tbl_Motores");
 
             entity.Property(e => e.IdMotor)
@@ -256,11 +242,11 @@ public partial class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<TblParametro>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("tbl_Parametros");
+            entity.HasKey(e => e.IdParametro);
+            entity.ToTable("tbl_Parametros");
 
             entity.Property(e => e.IdParametro)
+                .ValueGeneratedOnAdd()
                 .HasColumnType("numeric(18, 0)")
                 .HasColumnName("idParametro");
             entity.Property(e => e.NombreParametro)

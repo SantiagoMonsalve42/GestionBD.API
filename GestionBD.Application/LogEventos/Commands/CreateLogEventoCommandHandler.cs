@@ -1,16 +1,16 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using GestionBD.Infraestructure.Data.Entities;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.LogEventos.Commands;
 
 public sealed class CreateLogEventoCommandHandler : IRequestHandler<CreateLogEventoCommand, decimal>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateLogEventoCommandHandler(ApplicationDbContext context)
+    public CreateLogEventoCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<decimal> Handle(CreateLogEventoCommand command, CancellationToken cancellationToken)
@@ -23,8 +23,8 @@ public sealed class CreateLogEventoCommandHandler : IRequestHandler<CreateLogEve
             EstadoEvento = command.Request.EstadoEvento
         };
 
-        _context.TblLogEventos.Add(logEvento);
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.LogEventos.Add(logEvento);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return logEvento.IdEvento;
     }

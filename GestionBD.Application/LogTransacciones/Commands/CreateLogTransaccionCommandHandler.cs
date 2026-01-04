@@ -1,16 +1,16 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using GestionBD.Infraestructure.Data.Entities;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.LogTransacciones.Commands;
 
 public sealed class CreateLogTransaccionCommandHandler : IRequestHandler<CreateLogTransaccionCommand, decimal>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateLogTransaccionCommandHandler(ApplicationDbContext context)
+    public CreateLogTransaccionCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<decimal> Handle(CreateLogTransaccionCommand command, CancellationToken cancellationToken)
@@ -26,8 +26,8 @@ public sealed class CreateLogTransaccionCommandHandler : IRequestHandler<CreateL
             UsuarioEjecucion = command.Request.UsuarioEjecucion
         };
 
-        _context.TblLogTransacciones.Add(logTransaccion);
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.LogTransacciones.Add(logTransaccion);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return logTransaccion.IdTransaccion;
     }

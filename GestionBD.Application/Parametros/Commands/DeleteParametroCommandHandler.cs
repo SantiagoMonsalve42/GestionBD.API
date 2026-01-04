@@ -1,28 +1,27 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using Microsoft.EntityFrameworkCore;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.Parametros.Commands;
 
 public sealed class DeleteParametroCommandHandler : IRequestHandler<DeleteParametroCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteParametroCommandHandler(ApplicationDbContext context)
+    public DeleteParametroCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(DeleteParametroCommand command, CancellationToken cancellationToken)
     {
-        var parametro = await _context.TblParametros
-            .FirstOrDefaultAsync(p => p.IdParametro == command.IdParametro, cancellationToken);
+        var parametro = await _unitOfWork.FindEntityAsync<TblParametro>(command.IdParametro, cancellationToken);
 
         if (parametro == null)
             throw new KeyNotFoundException($"Parámetro con ID {command.IdParametro} no encontrado.");
 
-        _context.TblParametros.Remove(parametro);
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.Parametros.Remove(parametro);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }

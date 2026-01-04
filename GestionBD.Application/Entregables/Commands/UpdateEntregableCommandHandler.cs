@@ -1,22 +1,21 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using Microsoft.EntityFrameworkCore;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.Entregables.Commands;
 
 public sealed class UpdateEntregableCommandHandler : IRequestHandler<UpdateEntregableCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateEntregableCommandHandler(ApplicationDbContext context)
+    public UpdateEntregableCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(UpdateEntregableCommand command, CancellationToken cancellationToken)
     {
-        var entregable = await _context.TblEntregables
-            .FirstOrDefaultAsync(e => e.IdEntregable == command.Request.IdEntregable, cancellationToken);
+        var entregable = await _unitOfWork.FindEntityAsync<TblEntregable>(command.Request.IdEntregable, cancellationToken);
 
         if (entregable == null)
             throw new KeyNotFoundException($"Entregable con ID {command.Request.IdEntregable} no encontrado.");
@@ -25,7 +24,8 @@ public sealed class UpdateEntregableCommandHandler : IRequestHandler<UpdateEntre
         entregable.DescripcionEntregable = command.Request.DescripcionEntregable;
         entregable.IdEjecucion = command.Request.IdEjecucion;
 
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.Entregables.Update(entregable);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }

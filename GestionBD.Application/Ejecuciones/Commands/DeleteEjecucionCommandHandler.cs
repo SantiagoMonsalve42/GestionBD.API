@@ -1,28 +1,27 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using Microsoft.EntityFrameworkCore;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.Ejecuciones.Commands;
 
 public sealed class DeleteEjecucionCommandHandler : IRequestHandler<DeleteEjecucionCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteEjecucionCommandHandler(ApplicationDbContext context)
+    public DeleteEjecucionCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(DeleteEjecucionCommand command, CancellationToken cancellationToken)
     {
-        var ejecucion = await _context.TblEjecuciones
-            .FirstOrDefaultAsync(e => e.IdEjecucion == command.IdEjecucion, cancellationToken);
+        var ejecucion = await _unitOfWork.FindEntityAsync<TblEjecucione>(command.IdEjecucion, cancellationToken);
 
         if (ejecucion == null)
             throw new KeyNotFoundException($"Ejecución con ID {command.IdEjecucion} no encontrada.");
 
-        _context.TblEjecuciones.Remove(ejecucion);
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.Ejecuciones.Remove(ejecucion);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }

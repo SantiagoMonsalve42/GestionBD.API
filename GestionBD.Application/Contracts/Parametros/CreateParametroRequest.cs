@@ -2,10 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GestionBD.Application.Contracts.Parametros;
 
-public sealed record CreateParametroRequest(
-    [Required]
-    decimal IdParametro,
-    
+public sealed record CreateParametroRequest(    
     [Required(ErrorMessage = "El nombre del parámetro es requerido")]
     [MaxLength(150, ErrorMessage = "El nombre no puede exceder 150 caracteres")]
     string NombreParametro,

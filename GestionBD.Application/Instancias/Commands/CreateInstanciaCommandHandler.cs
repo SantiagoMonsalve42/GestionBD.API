@@ -1,16 +1,16 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using GestionBD.Infraestructure.Data.Entities;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.Instancias.Commands;
 
 public sealed class CreateInstanciaCommandHandler : IRequestHandler<CreateInstanciaCommand, decimal>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateInstanciaCommandHandler(ApplicationDbContext context)
+    public CreateInstanciaCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<decimal> Handle(CreateInstanciaCommand command, CancellationToken cancellationToken)
@@ -24,8 +24,8 @@ public sealed class CreateInstanciaCommandHandler : IRequestHandler<CreateInstan
             Password = command.Request.Password
         };
 
-        _context.TblInstancias.Add(instancia);
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.Instancias.Add(instancia);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return instancia.IdInstancia;
     }

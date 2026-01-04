@@ -1,16 +1,16 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using GestionBD.Infraestructure.Data.Entities;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.Artefactos.Commands;
 
 public sealed class CreateArtefactoCommandHandler : IRequestHandler<CreateArtefactoCommand, decimal>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateArtefactoCommandHandler(ApplicationDbContext context)
+    public CreateArtefactoCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<decimal> Handle(CreateArtefactoCommand command, CancellationToken cancellationToken)
@@ -25,8 +25,8 @@ public sealed class CreateArtefactoCommandHandler : IRequestHandler<CreateArtefa
             EsReverso = command.Request.EsReverso
         };
 
-        _context.TblArtefactos.Add(artefacto);
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.Artefactos.Add(artefacto);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return artefacto.IdArtefacto;
     }

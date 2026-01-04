@@ -1,16 +1,16 @@
 using MediatR;
-using GestionBD.Infraestructure.Data;
-using GestionBD.Infraestructure.Data.Entities;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
 
 namespace GestionBD.Application.Entregables.Commands;
 
 public sealed class CreateEntregableCommandHandler : IRequestHandler<CreateEntregableCommand, decimal>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateEntregableCommandHandler(ApplicationDbContext context)
+    public CreateEntregableCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<decimal> Handle(CreateEntregableCommand command, CancellationToken cancellationToken)
@@ -22,8 +22,8 @@ public sealed class CreateEntregableCommandHandler : IRequestHandler<CreateEntre
             IdEjecucion = command.Request.IdEjecucion
         };
 
-        _context.TblEntregables.Add(entregable);
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.Entregables.Add(entregable);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return entregable.IdEntregable;
     }
