@@ -39,11 +39,9 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 app.UseExceptionHandling();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//Corregir en ambiente productivo
+app.UseSwagger();
+app.UseSwaggerUI();
 
 //app.UseHttpsRedirection();
 
