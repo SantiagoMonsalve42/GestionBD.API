@@ -23,9 +23,8 @@ public sealed class EjecucionReadRepository : IEjecucionReadRepository
                 e.horaInicioEjecucion AS HoraInicioEjecucion,
                 e.horaFinEjecucion AS HoraFinEjecucion,
                 e.descripcion AS Descripcion,
-                i.instancia AS NombreInstancia
+                e.nombreRequerimiento AS NombreRequerimiento
             FROM dbo.tbl_Ejecuciones e
-            INNER JOIN dbo.tbl_Instancias i ON e.idInstancia = i.idInstancia
             ORDER BY e.horaInicioEjecucion DESC;
             """;
 
@@ -41,9 +40,8 @@ public sealed class EjecucionReadRepository : IEjecucionReadRepository
                 e.horaInicioEjecucion AS HoraInicioEjecucion,
                 e.horaFinEjecucion AS HoraFinEjecucion,
                 e.descripcion AS Descripcion,
-                i.instancia AS NombreInstancia
+                e.nombreRequerimiento AS NombreRequerimiento
             FROM dbo.tbl_Ejecuciones e
-            INNER JOIN dbo.tbl_Instancias i ON e.idInstancia = i.idInstancia
             WHERE e.idEjecucion = @Id;
             """;
 

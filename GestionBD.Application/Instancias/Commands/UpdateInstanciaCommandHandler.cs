@@ -25,6 +25,7 @@ public sealed class UpdateInstanciaCommandHandler : IRequestHandler<UpdateInstan
         instancia.Puerto = command.Request.Puerto;
         instancia.Usuario = command.Request.Usuario;
         instancia.Password = command.Request.Password;
+        instancia.NombreDB = command.Request.NombreDB;
 
         _unitOfWork.Instancias.Update(instancia);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

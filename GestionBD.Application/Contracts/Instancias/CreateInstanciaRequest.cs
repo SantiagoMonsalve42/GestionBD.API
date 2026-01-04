@@ -20,5 +20,8 @@ public sealed record CreateInstanciaRequest(
     
     [Required(ErrorMessage = "La contraseña es requerida")]
     [MaxLength(150, ErrorMessage = "La contraseña no puede exceder 150 caracteres")]
-    string Password
+    string Password,
+    [Required(ErrorMessage = "El nombre de la base de datos es requerida")]
+    [MaxLength(150, ErrorMessage = "El nombre de la base de datos no puede exceder 150 caracteres")]
+    string NombreDB
 );

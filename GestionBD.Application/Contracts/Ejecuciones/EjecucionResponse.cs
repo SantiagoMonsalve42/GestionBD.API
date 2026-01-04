@@ -6,5 +6,5 @@ public sealed record EjecucionResponse(
     DateTime HoraInicioEjecucion,
     DateTime HoraFinEjecucion,
     string? Descripcion,
-    string? NombreInstancia
+    string? NombreRequerimiento
 );

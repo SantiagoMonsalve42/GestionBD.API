@@ -21,7 +21,8 @@ public sealed class CreateInstanciaCommandHandler : IRequestHandler<CreateInstan
             Instancia = command.Request.Instancia,
             Puerto = command.Request.Puerto,
             Usuario = command.Request.Usuario,
-            Password = command.Request.Password
+            Password = command.Request.Password,
+            NombreDB = command.Request.NombreDB
         };
 
         _unitOfWork.Instancias.Add(instancia);

@@ -20,7 +20,8 @@ public sealed class CreateEjecucionCommandHandler : IRequestHandler<CreateEjecuc
             IdInstancia = command.Request.IdInstancia,
             HoraInicioEjecucion = command.Request.HoraInicioEjecucion,
             HoraFinEjecucion = command.Request.HoraFinEjecucion,
-            Descripcion = command.Request.Descripcion
+            Descripcion = command.Request.Descripcion,
+            NombreRequerimiento = command.Request.NombreRequerimiento
         };
 
         _unitOfWork.Ejecuciones.Add(ejecucion);

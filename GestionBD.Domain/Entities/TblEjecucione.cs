@@ -6,11 +6,12 @@ public partial class TblEjecucione
 
     public decimal IdInstancia { get; set; }
 
-    public DateTime HoraInicioEjecucion { get; set; }
+    public DateTime? HoraInicioEjecucion { get; set; }
 
-    public DateTime HoraFinEjecucion { get; set; }
+    public DateTime? HoraFinEjecucion { get; set; }
 
     public string? Descripcion { get; set; }
+    public string? NombreRequerimiento { get; set; }
 
     public virtual TblInstancia IdInstanciaNavigation { get; set; } = null!;
 

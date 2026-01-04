@@ -6,5 +6,5 @@ public sealed record InstanciaResponse(
     string Instancia,
     int Puerto,
     string Usuario,
-    string? NombreMotor
+    string NombreBD
 );

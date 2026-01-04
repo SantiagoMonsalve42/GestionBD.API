@@ -9,12 +9,14 @@ public sealed record UpdateEjecucionRequest(
     [Required]
     decimal IdInstancia,
     
-    [Required]
-    DateTime HoraInicioEjecucion,
+    DateTime? HoraInicioEjecucion,
     
-    [Required]
-    DateTime HoraFinEjecucion,
+    DateTime? HoraFinEjecucion,
     
     [MaxLength(150, ErrorMessage = "La descripción no puede exceder 150 caracteres")]
-    string? Descripcion
+    string? Descripcion,
+
+    [Required]
+    [MaxLength(150, ErrorMessage = "El nombre del requerimiento no puede exceder 150 caracteres")]
+    string NombreRequerimiento
 );

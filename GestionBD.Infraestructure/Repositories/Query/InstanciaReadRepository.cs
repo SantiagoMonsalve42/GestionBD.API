@@ -23,9 +23,8 @@ public sealed class InstanciaReadRepository : IInstanciaReadRepository
                 i.instancia AS Instancia,
                 i.puerto AS Puerto,
                 i.usuario AS Usuario,
-                m.nombreMotor AS NombreMotor
+                i.nombreBD AS NombreBD
             FROM dbo.tbl_Instancias i
-            INNER JOIN dbo.tbl_Motores m ON i.idMotor = m.idMotor
             ORDER BY i.instancia;
             """;
 
@@ -41,9 +40,8 @@ public sealed class InstanciaReadRepository : IInstanciaReadRepository
                 i.instancia AS Instancia,
                 i.puerto AS Puerto,
                 i.usuario AS Usuario,
-                m.nombreMotor AS NombreMotor
+                i.nombreBD AS NombreBD
             FROM dbo.tbl_Instancias i
-            INNER JOIN dbo.tbl_Motores m ON i.idMotor = m.idMotor
             WHERE i.idInstancia = @Id;
             """;
 

@@ -24,6 +24,7 @@ public sealed class UpdateEjecucionCommandHandler : IRequestHandler<UpdateEjecuc
         ejecucion.HoraInicioEjecucion = command.Request.HoraInicioEjecucion;
         ejecucion.HoraFinEjecucion = command.Request.HoraFinEjecucion;
         ejecucion.Descripcion = command.Request.Descripcion;
+        ejecucion.NombreRequerimiento = command.Request.NombreRequerimiento;
 
         _unitOfWork.Ejecuciones.Update(ejecucion);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

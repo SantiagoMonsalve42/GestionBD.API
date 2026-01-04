@@ -85,6 +85,10 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.IdInstancia)
                 .HasColumnType("numeric(18, 0)")
                 .HasColumnName("idInstancia");
+            entity.Property(e => e.NombreRequerimiento)
+                .HasMaxLength(150)
+                .IsUnicode(false)
+                .HasColumnName("nombreRequerimiento");
 
             entity.HasOne(d => d.IdInstanciaNavigation).WithMany(p => p.TblEjecuciones)
                 .HasForeignKey(d => d.IdInstancia)
@@ -144,6 +148,10 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(150)
                 .IsUnicode(false)
                 .HasColumnName("usuario");
+            entity.Property(e => e.NombreDB)
+                .HasMaxLength(150)
+                .IsUnicode(false)
+                .HasColumnName("nombreBD");
 
             entity.HasOne(d => d.IdMotorNavigation).WithMany(p => p.TblInstancia)
                 .HasForeignKey(d => d.IdMotor)

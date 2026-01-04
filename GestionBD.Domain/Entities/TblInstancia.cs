@@ -13,6 +13,7 @@ public partial class TblInstancia
     public decimal IdMotor { get; set; }
 
     public int Puerto { get; set; }
+    public string NombreDB { get; set; } = null!;
 
     public virtual TblMotore IdMotorNavigation { get; set; } = null!;
 
