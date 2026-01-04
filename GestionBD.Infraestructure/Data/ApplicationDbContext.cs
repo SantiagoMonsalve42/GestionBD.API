@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using GestionBD.Infraestructure.Data.Entities;
+﻿
 using Microsoft.EntityFrameworkCore;
 
 namespace GestionBD.Infraestructure.Data;

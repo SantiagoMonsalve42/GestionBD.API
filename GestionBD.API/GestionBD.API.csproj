@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GestionBD.Application\GestionBD.Application.csproj" />
-    <ProjectReference Include="..\GestionBD.Domain\GestionBD.Domain.csproj" />
     <ProjectReference Include="..\GestionBD.Infraestructure\GestionBD.Infraestructure.csproj" />
   </ItemGroup>
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace GestionBD.Infraestructure.Data.Entities;
+﻿namespace GestionBD.Domain.Entities;
 
 public partial class TblParametro
 {
