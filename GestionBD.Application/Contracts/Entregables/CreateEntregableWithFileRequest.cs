@@ -12,9 +12,6 @@ public sealed class CreateEntregableWithFileRequest
     [Required(ErrorMessage = "El ID de ejecución es requerido")]
     public decimal IdEjecucion { get; set; }
 
-    [Required(ErrorMessage = "El número de entrega es requerido")]
-    public int NumeroEntrega { get; set; }
-
     [Required(ErrorMessage = "El archivo es requerido")]
     public IFormFile File { get; set; } = null!;
 }

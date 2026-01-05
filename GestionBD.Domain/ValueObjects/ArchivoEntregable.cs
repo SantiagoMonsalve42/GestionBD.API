@@ -1,6 +1,6 @@
+using GestionBD.Domain.Entities;
 using GestionBD.Domain.Exceptions;
 using System.IO.Compression;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GestionBD.Domain.ValueObjects;
 
@@ -14,7 +14,7 @@ public sealed record ArchivoEntregable
     public long FileSize { get; }
     public string Extension { get; }
 
-    private ArchivoEntregable(string fileName, long fileSize,string reqName,int deliveryCount)
+    private ArchivoEntregable(string fileName, long fileSize, string reqName, int deliveryCount)
     {
         FileName = $"{reqName}\\Entrega{deliveryCount}\\entregable.zip";
         FileSize = fileSize;
@@ -48,7 +48,7 @@ public sealed record ArchivoEntregable
                 $"Solo se permiten archivos con extensiones: {string.Join(", ", AllowedExtensions)}");
         }
 
-        return new ArchivoEntregable(fileName, fileSize,reqName,deliveryCount);
+        return new ArchivoEntregable(fileName, fileSize, reqName, deliveryCount);
     }
 
     /// <summary>
@@ -112,5 +112,93 @@ public sealed record ArchivoEntregable
         {
             throw new ValidationException("File", $"Error al validar el contenido del archivo .zip: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Obtiene una lista de artefactos a partir del contenido del archivo .zip
+    /// </summary>
+    /// <param name="zipStream">Stream del archivo .zip</param>
+    /// <param name="idEntregable">ID del entregable al que pertenecen los artefactos</param>
+    /// <param name="rutaBase">Ruta base donde se guardó el .zip</param>
+    /// <returns>Lista de TblArtefacto con la información de cada archivo .sql</returns>
+    public static List<TblArtefacto> ObtenerArtefactos(Stream zipStream, decimal idEntregable, string rutaBase)
+    {
+        if (zipStream == null || !zipStream.CanRead)
+        {
+            throw new ValidationException("File", "El stream del archivo no es válido");
+        }
+
+        var artefactos = new List<TblArtefacto>();
+
+        try
+        {
+            using var archive = new ZipArchive(zipStream, ZipArchiveMode.Read, leaveOpen: true);
+
+            var sqlEntries = archive.Entries
+                .Where(e => !string.IsNullOrWhiteSpace(e.Name) && 
+                           Path.GetExtension(e.Name).Equals(".sql", StringComparison.OrdinalIgnoreCase))
+                .OrderBy(e => e.FullName) // Ordenar alfabéticamente
+                .ToList();
+
+            if (!sqlEntries.Any())
+            {
+                throw new ValidationException("File", "El archivo .zip no contiene archivos .sql");
+            }
+
+            int ordenEjecucion = 1;
+
+            foreach (var entry in sqlEntries)
+            {
+                var nombreArtefacto = Path.GetFileNameWithoutExtension(entry.Name);
+                var rutaRelativa = entry.FullName.Replace('/', '\\'); 
+
+                var codificacion = DeterminarCodificacion(nombreArtefacto);
+
+                var esReverso = nombreArtefacto.Contains("rollback", StringComparison.OrdinalIgnoreCase) ||
+                               nombreArtefacto.Contains("reverso", StringComparison.OrdinalIgnoreCase) ||
+                               nombreArtefacto.Contains("revert", StringComparison.OrdinalIgnoreCase);
+
+                var artefacto = new TblArtefacto
+                {
+                    IdEntregable = idEntregable,
+                    OrdenEjecucion = ordenEjecucion++,
+                    Codificacion = codificacion,
+                    NombreArtefacto = entry.Name,
+                    RutaRelativa = Path.Combine(rutaBase, rutaRelativa),
+                    EsReverso = esReverso
+                };
+
+                artefactos.Add(artefacto);
+            }
+
+            // Resetear el stream a la posición inicial
+            if (zipStream.CanSeek)
+            {
+                zipStream.Position = 0;
+            }
+
+            return artefactos;
+        }
+        catch (InvalidDataException)
+        {
+            throw new ValidationException("File", "El archivo .zip está corrupto o no es un archivo válido");
+        }
+        catch (ValidationException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new ValidationException("File", $"Error al procesar los artefactos del archivo .zip: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Determina la codificación del archivo basándose en su nombre
+    /// Puedes personalizar esta lógica según tus convenciones de nomenclatura
+    /// </summary>
+    private static string DeterminarCodificacion(string nombreArtefacto)
+    {
+        return "UTF-8";
     }
 }

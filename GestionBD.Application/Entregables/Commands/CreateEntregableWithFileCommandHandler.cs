@@ -54,9 +54,7 @@ public sealed class CreateEntregableWithFileCommandHandler : IRequestHandler<Cre
             throw new ValidationException("File", $"Error al guardar el archivo: {ex.Message}");
         }
 
-        // Crear el entregable con la ruta del archivo guardado
         
-
         var entregable = new TblEntregable
         {
             RutaEntregable = rutaEntregable,
@@ -66,6 +64,13 @@ public sealed class CreateEntregableWithFileCommandHandler : IRequestHandler<Cre
         };
 
         _unitOfWork.Entregables.Add(entregable);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        var artefactos = ArchivoEntregable.ObtenerArtefactos(stream, entregable.IdEntregable, rutaEntregable);
+        foreach(var artefacto in artefactos)
+        {
+            artefacto.IdEntregable = entregable.IdEntregable;
+            _unitOfWork.Artefactos.Add(artefacto);
+        }
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return entregable.IdEntregable;
