@@ -9,6 +9,7 @@ public partial class TblEntregable
     public string DescripcionEntregable { get; set; } = null!;
 
     public decimal IdEjecucion { get; set; }
+    public int NumeroEntrega { get; set; }
 
     public virtual TblEjecucione IdEjecucionNavigation { get; set; } = null!;
 

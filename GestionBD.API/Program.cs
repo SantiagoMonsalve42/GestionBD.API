@@ -7,6 +7,7 @@ using GestionBD.Domain;
 using GestionBD.Infraestructure;
 using GestionBD.Application.Abstractions;
 using GestionBD.Infraestructure.Repositories.Query;
+using GestionBD.Infraestructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,9 @@ builder.Services.AddScoped<IDbConnection>(sp =>
 
 // Unit of Work (para Commands)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// File Storage Service
+builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
 // Read Repositories (para Queries - Dapper)
 builder.Services.AddScoped<IArtefactoReadRepository, ArtefactoReadRepository>();

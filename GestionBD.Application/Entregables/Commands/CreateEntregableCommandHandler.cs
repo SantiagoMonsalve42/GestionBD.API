@@ -19,7 +19,8 @@ public sealed class CreateEntregableCommandHandler : IRequestHandler<CreateEntre
         {
             RutaEntregable = command.Request.RutaEntregable,
             DescripcionEntregable = command.Request.DescripcionEntregable,
-            IdEjecucion = command.Request.IdEjecucion
+            IdEjecucion = command.Request.IdEjecucion,
+            NumeroEntrega = command.Request.NumeroEntrega
         };
 
         _unitOfWork.Entregables.Add(entregable);

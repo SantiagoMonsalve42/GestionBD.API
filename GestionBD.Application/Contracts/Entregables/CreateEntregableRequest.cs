@@ -12,5 +12,8 @@ public sealed record CreateEntregableRequest(
     string DescripcionEntregable,
     
     [Required]
-    decimal IdEjecucion
+    decimal IdEjecucion,
+
+    [Required]
+    int NumeroEntrega
 );

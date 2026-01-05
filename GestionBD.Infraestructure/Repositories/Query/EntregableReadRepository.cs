@@ -22,7 +22,8 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
                 ent.rutaEntregable AS RutaEntregable,
                 ent.descripcionEntregable AS DescripcionEntregable,
                 ent.idEjecucion AS IdEjecucion,
-                ej.descripcion AS DescripcionEjecucion
+                ej.descripcion AS DescripcionEjecucion,
+                ent.numeroEntrega AS NumeroEntrega
             FROM dbo.tbl_Entregables ent
             INNER JOIN dbo.tbl_Ejecuciones ej ON ent.idEjecucion = ej.idEjecucion
             ORDER BY ent.idEntregable DESC;
@@ -39,7 +40,8 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
                 ent.rutaEntregable AS RutaEntregable,
                 ent.descripcionEntregable AS DescripcionEntregable,
                 ent.idEjecucion AS IdEjecucion,
-                ej.descripcion AS DescripcionEjecucion
+                ej.descripcion AS DescripcionEjecucion,
+                ent.numeroEntrega AS NumeroEntrega
             FROM dbo.tbl_Entregables ent
             INNER JOIN dbo.tbl_Ejecuciones ej ON ent.idEjecucion = ej.idEjecucion
             WHERE ent.idEntregable = @Id;

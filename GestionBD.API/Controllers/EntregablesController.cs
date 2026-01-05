@@ -17,19 +17,25 @@ public sealed class EntregablesController : ControllerBase
         _mediator = mediator;
     }
 
+
     /// <summary>
-    /// Crea un nuevo entregable
+    /// Crea un nuevo entregable con archivo .zip
     /// </summary>
     [HttpPost]
+    [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(decimal), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create([FromBody] CreateEntregableRequest request)
+    public async Task<IActionResult> CreateWithFile(
+        [FromForm] CreateEntregableWithFileRequest request,
+        CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var command = new CreateEntregableWithFileCommand(request);
+        var entregableId = await _mediator.Send(command, cancellationToken);
 
-        var id = await _mediator.Send(new CreateEntregableCommand(request));
-        return CreatedAtAction(nameof(GetById), new { id }, new { id });
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = entregableId },
+            new { id = entregableId, message = "Entregable creado exitosamente" });
     }
 
     /// <summary>
