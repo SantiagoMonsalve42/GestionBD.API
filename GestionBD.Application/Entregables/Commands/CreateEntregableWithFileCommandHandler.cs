@@ -29,50 +29,85 @@ public sealed class CreateEntregableWithFileCommandHandler : IRequestHandler<Cre
     public async Task<decimal> Handle(CreateEntregableWithFileCommand command, CancellationToken cancellationToken)
     {
         var file = command.Request.File;
-        int cantidadEntregas = (await _entregableReadRepository.GetEntregablesByEjecucion(command.Request.IdEjecucion)) + 1;
-        var ejecucion = await _ejecucionReadRepository.GetByIdAsync(command.Request.IdEjecucion, cancellationToken);
-        // Validar el archivo usando el Value Object del dominio
-        var archivoEntregable = ArchivoEntregable.Crear(file.FileName, file.Length,ejecucion.NombreRequerimiento,cantidadEntregas);
+        string? rutaEntregable = null;
 
-        // Abrir el stream del archivo
-        using var stream = file.OpenReadStream();
-
-        // Validar que todos los archivos dentro del .zip sean .sql
-        ArchivoEntregable.ValidarContenidoZip(stream);
-
-        // Guardar el archivo y obtener la ruta
-        string rutaEntregable;
         try
         {
+            int cantidadEntregas = (await _entregableReadRepository.GetEntregablesByEjecucion(command.Request.IdEjecucion)) + 1;
+            var ejecucion = await _ejecucionReadRepository.GetByIdAsync(command.Request.IdEjecucion, cancellationToken);
+
+            if (ejecucion == null)
+            {
+                throw new ValidationException("IdEjecucion", "La ejecución no existe");
+            }
+
+            var archivoEntregable = ArchivoEntregable.Crear(
+                file.FileName, 
+                file.Length, 
+                ejecucion.NombreRequerimiento, 
+                cantidadEntregas);
+
+            using var stream = file.OpenReadStream();
+
+            ArchivoEntregable.ValidarContenidoZip(stream);
+
             rutaEntregable = await _fileStorageService.SaveFileAsync(
                 stream,
                 archivoEntregable.FileName,
                 cancellationToken);
+
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+            try
+            {
+                var entregable = new TblEntregable
+                {
+                    RutaEntregable = rutaEntregable,
+                    DescripcionEntregable = command.Request.DescripcionEntregable,
+                    IdEjecucion = command.Request.IdEjecucion,
+                    NumeroEntrega = cantidadEntregas
+                };
+
+                _unitOfWork.Entregables.Add(entregable);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                var artefactos = ArchivoEntregable.ObtenerArtefactos(
+                    stream, 
+                    entregable.IdEntregable, 
+                    rutaEntregable);
+
+                foreach (var artefacto in artefactos)
+                {
+                    artefacto.IdEntregable = entregable.IdEntregable;
+                    _unitOfWork.Artefactos.Add(artefacto);
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                return entregable.IdEntregable;
+            }
+            catch (Exception)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                if (!string.IsNullOrEmpty(rutaEntregable))
+                {
+                    await _fileStorageService.DeleteFileAsync(rutaEntregable, cancellationToken);
+                }
+                throw; 
+            }
+        }
+        catch (ValidationException)
+        {
+            throw;
         }
         catch (Exception ex)
         {
-            throw new ValidationException("File", $"Error al guardar el archivo: {ex.Message}");
+            if (!string.IsNullOrEmpty(rutaEntregable))
+            {
+                await _fileStorageService.DeleteFileAsync(rutaEntregable, cancellationToken);
+            }
+
+            throw new ValidationException("File", $"Error al procesar el entregable: {ex.Message}");
         }
-
-        
-        var entregable = new TblEntregable
-        {
-            RutaEntregable = rutaEntregable,
-            DescripcionEntregable = command.Request.DescripcionEntregable,
-            IdEjecucion = command.Request.IdEjecucion,
-            NumeroEntrega = cantidadEntregas
-        };
-
-        _unitOfWork.Entregables.Add(entregable);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        var artefactos = ArchivoEntregable.ObtenerArtefactos(stream, entregable.IdEntregable, rutaEntregable);
-        foreach(var artefacto in artefactos)
-        {
-            artefacto.IdEntregable = entregable.IdEntregable;
-            _unitOfWork.Artefactos.Add(artefacto);
-        }
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return entregable.IdEntregable;
     }
 }
