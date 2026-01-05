@@ -23,7 +23,7 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
                 ent.descripcionEntregable AS DescripcionEntregable,
                 ent.idEjecucion AS IdEjecucion,
                 ej.descripcion AS DescripcionEjecucion,
-                ent.numeroEntrega AS NumeroEntrega
+                ent.nombreRequerimiento AS NombreRequerimiento
             FROM dbo.tbl_Entregables ent
             INNER JOIN dbo.tbl_Ejecuciones ej ON ent.idEjecucion = ej.idEjecucion
             ORDER BY ent.idEntregable DESC;
@@ -41,12 +41,22 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
                 ent.descripcionEntregable AS DescripcionEntregable,
                 ent.idEjecucion AS IdEjecucion,
                 ej.descripcion AS DescripcionEjecucion,
-                ent.numeroEntrega AS NumeroEntrega
+                ent.nombreRequerimiento AS NombreRequerimiento
             FROM dbo.tbl_Entregables ent
             INNER JOIN dbo.tbl_Ejecuciones ej ON ent.idEjecucion = ej.idEjecucion
             WHERE ent.idEntregable = @Id;
             """;
 
         return await _connection.QueryFirstOrDefaultAsync<EntregableResponse>(sql, new { Id = id });
+    }
+
+    public async Task<int> GetEntregablesByEjecucion(decimal idEjecucion)
+    {
+        const string sql = """
+            select count(1) from dbo.tbl_Entregables
+            where idEjecucion = @Id
+            """;
+
+        return await _connection.ExecuteScalarAsync<int>(sql, new { Id = idEjecucion });
     }
 }

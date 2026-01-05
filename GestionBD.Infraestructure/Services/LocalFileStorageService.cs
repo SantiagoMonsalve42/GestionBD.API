@@ -21,11 +21,12 @@ public sealed class LocalFileStorageService : IFileStorageService
 
     public async Task<string> SaveFileAsync(Stream fileStream, string fileName, CancellationToken cancellationToken = default)
     {
-        // Generar un nombre único para evitar colisiones
-        var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-        var uniqueFileName = $"{timestamp}_{fileName}";
-        var fullPath = Path.Combine(_basePath, uniqueFileName);
-
+        var fullPath = Path.Combine(_basePath, fileName);
+        string directoryPath = Path.GetDirectoryName(fullPath);
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
         // Guardar el archivo
         using var fileStreamOutput = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None);
         await fileStream.CopyToAsync(fileStreamOutput, cancellationToken);

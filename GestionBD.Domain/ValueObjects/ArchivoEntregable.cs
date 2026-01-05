@@ -1,5 +1,6 @@
 using GestionBD.Domain.Exceptions;
 using System.IO.Compression;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GestionBD.Domain.ValueObjects;
 
@@ -13,14 +14,14 @@ public sealed record ArchivoEntregable
     public long FileSize { get; }
     public string Extension { get; }
 
-    private ArchivoEntregable(string fileName, long fileSize)
+    private ArchivoEntregable(string fileName, long fileSize,string reqName,int deliveryCount)
     {
-        FileName = fileName;
+        FileName = $"{reqName}\\Entrega{deliveryCount}\\entregable.zip";
         FileSize = fileSize;
         Extension = Path.GetExtension(fileName).ToLowerInvariant();
     }
-
-    public static ArchivoEntregable Crear(string fileName, long fileSize)
+    
+    public static ArchivoEntregable Crear(string fileName, long fileSize, string reqName, int deliveryCount)
     {
         if (string.IsNullOrWhiteSpace(fileName))
         {
@@ -47,7 +48,7 @@ public sealed record ArchivoEntregable
                 $"Solo se permiten archivos con extensiones: {string.Join(", ", AllowedExtensions)}");
         }
 
-        return new ArchivoEntregable(fileName, fileSize);
+        return new ArchivoEntregable(fileName, fileSize,reqName,deliveryCount);
     }
 
     /// <summary>

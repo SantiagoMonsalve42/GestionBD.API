@@ -11,21 +11,28 @@ public sealed class CreateEntregableWithFileCommandHandler : IRequestHandler<Cre
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IFileStorageService _fileStorageService;
+    private readonly IEntregableReadRepository _entregableReadRepository;
+    private readonly IEjecucionReadRepository _ejecucionReadRepository;
 
     public CreateEntregableWithFileCommandHandler(
         IUnitOfWork unitOfWork,
-        IFileStorageService fileStorageService)
+        IFileStorageService fileStorageService,
+        IEntregableReadRepository entregableReadRepository,
+        IEjecucionReadRepository ejecucionReadRepository)
     {
         _unitOfWork = unitOfWork;
         _fileStorageService = fileStorageService;
+        _entregableReadRepository = entregableReadRepository;
+        _ejecucionReadRepository = ejecucionReadRepository;
     }
 
     public async Task<decimal> Handle(CreateEntregableWithFileCommand command, CancellationToken cancellationToken)
     {
         var file = command.Request.File;
-
+        int cantidadEntregas = (await _entregableReadRepository.GetEntregablesByEjecucion(command.Request.IdEjecucion)) + 1;
+        var ejecucion = await _ejecucionReadRepository.GetByIdAsync(command.Request.IdEjecucion, cancellationToken);
         // Validar el archivo usando el Value Object del dominio
-        var archivoEntregable = ArchivoEntregable.Crear(file.FileName, file.Length);
+        var archivoEntregable = ArchivoEntregable.Crear(file.FileName, file.Length,ejecucion.NombreRequerimiento,cantidadEntregas);
 
         // Abrir el stream del archivo
         using var stream = file.OpenReadStream();
@@ -48,12 +55,14 @@ public sealed class CreateEntregableWithFileCommandHandler : IRequestHandler<Cre
         }
 
         // Crear el entregable con la ruta del archivo guardado
+        
+
         var entregable = new TblEntregable
         {
             RutaEntregable = rutaEntregable,
             DescripcionEntregable = command.Request.DescripcionEntregable,
             IdEjecucion = command.Request.IdEjecucion,
-            NumeroEntrega = command.Request.NumeroEntrega
+            NumeroEntrega = cantidadEntregas
         };
 
         _unitOfWork.Entregables.Add(entregable);

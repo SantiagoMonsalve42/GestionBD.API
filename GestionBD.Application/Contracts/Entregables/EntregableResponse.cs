@@ -5,6 +5,6 @@ public sealed record EntregableResponse(
     string RutaEntregable,
     string DescripcionEntregable,
     decimal IdEjecucion,
-    string? DescripcionEjecucion,
+    string? NombreRequerimiento,
     int NumeroEntrega
 );
