@@ -56,7 +56,8 @@ public sealed class InstanciaReadRepository : IInstanciaReadRepository
             	i.usuario AS Usuario,
             	i.password AS Password,
             	i.puerto AS Puerto,
-            	i.nombreBD AS NombreBD
+            	i.nombreBD AS NombreBD,
+                en.temporalBD AS TemporalBD
               from [dbo].[tbl_Instancias] i
               join dbo.tbl_Ejecuciones e
               on i.idInstancia = e.idEjecucion

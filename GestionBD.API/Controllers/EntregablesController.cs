@@ -109,13 +109,13 @@ public sealed class EntregablesController : ControllerBase
             return NotFound(new { message = ex.Message });
         }
     }
-    [HttpPost("validate/{idEntregable:decimal}")]
+    [HttpPost("first-step/{idEntregable:decimal}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ValidateEntregableFile(decimal idEntregable)
     {
-        var isValid = await _mediator.Send(new ValidateEntregableCommand(idEntregable));
+        var isValid = await _mediator.Send(new DesplegarEntregableEfimeroCommand(idEntregable));
         return Ok(new { isValid });
     }
 }

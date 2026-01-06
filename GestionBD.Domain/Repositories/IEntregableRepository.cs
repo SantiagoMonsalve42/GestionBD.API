@@ -4,5 +4,5 @@ namespace GestionBD.Domain.Repositories;
 
 public interface IEntregableRepository : IRepository<TblEntregable>
 {
-    Task<bool> UpdateDACPAC(decimal idEntregable, string rutaDacpac, CancellationToken cancellationToken = default);
+    Task<bool> UpdateDACPAC(decimal idEntregable, string rutaDacpac,string temporalBD, CancellationToken cancellationToken = default);
 }

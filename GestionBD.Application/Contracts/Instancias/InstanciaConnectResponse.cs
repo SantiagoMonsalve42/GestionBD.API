@@ -5,5 +5,6 @@ public sealed record InstanciaConnectResponse(
     string Usuario,
     string Password,
     int Puerto,
-    string NombreBD
+    string NombreBD,
+    string? TemporalBD
 );

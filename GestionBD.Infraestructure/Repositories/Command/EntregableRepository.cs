@@ -11,11 +11,12 @@ public sealed class EntregableRepository : Repository<TblEntregable>, IEntregabl
     {
     }
 
-    public async Task<bool> UpdateDACPAC(decimal idEntregable, string rutaDacpac, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateDACPAC(decimal idEntregable, string rutaDacpac,string temporalBD, CancellationToken cancellationToken = default)
     {
         var result = await _context.TblEntregables.Where(x=> x.IdEntregable == idEntregable)
             .ExecuteUpdateAsync(setters => setters
-                .SetProperty(b => b.RutaDACPAC, rutaDacpac), cancellationToken);
+                .SetProperty(b => b.RutaDACPAC, rutaDacpac)
+                .SetProperty(c => c.TemporalBD, temporalBD), cancellationToken);
         return result > 0;
     }
 }
