@@ -1,10 +1,9 @@
 namespace GestionBD.Application.Contracts.Instancias;
 
-public sealed record InstanciaResponse(
-    decimal IdInstancia,
-    decimal IdMotor,
+public sealed record InstanciaConnectResponse(
     string Instancia,
-    int Puerto,
     string Usuario,
+    string Password,
+    int Puerto,
     string NombreBD
 );

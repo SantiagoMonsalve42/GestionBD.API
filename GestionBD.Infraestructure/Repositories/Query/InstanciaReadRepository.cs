@@ -47,4 +47,24 @@ public sealed class InstanciaReadRepository : IInstanciaReadRepository
 
         return await _connection.QueryFirstOrDefaultAsync<InstanciaResponse>(sql, new { Id = id });
     }
+
+    public async Task<InstanciaConnectResponse?> GetConnectionDetailsByEntregableIdAsync(decimal id, CancellationToken cancellationToken = default)
+    {
+        const string sql = """
+            select 
+            	i.instancia AS Instancia,
+            	i.usuario AS Usuario,
+            	i.password AS Password,
+            	i.puerto AS Puerto,
+            	i.nombreBD AS NombreBD
+              from [dbo].[tbl_Instancias] i
+              join dbo.tbl_Ejecuciones e
+              on i.idInstancia = e.idEjecucion
+              join dbo.tbl_Entregables en
+              on en.idEjecucion = e.idEjecucion
+              where en.idEntregable = @Id
+            """;
+
+        return await _connection.QueryFirstOrDefaultAsync<InstanciaConnectResponse>(sql, new { Id = id });
+    }
 }
