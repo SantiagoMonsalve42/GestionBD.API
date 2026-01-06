@@ -11,6 +11,8 @@ public partial class TblEntregable
     public decimal IdEjecucion { get; set; }
     public int NumeroEntrega { get; set; }
 
+    public string? RutaDACPAC { get; set; } 
+
     public virtual TblEjecucione IdEjecucionNavigation { get; set; } = null!;
 
     public virtual ICollection<TblArtefacto> TblArtefactos { get; set; } = new List<TblArtefacto>();

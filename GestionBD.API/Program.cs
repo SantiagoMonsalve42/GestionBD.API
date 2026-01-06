@@ -34,7 +34,7 @@ builder.Services.AddScoped<IMotorReadRepository, MotorReadRepository>();
 builder.Services.AddScoped<ILogEventoReadRepository, LogEventoReadRepository>();
 builder.Services.AddScoped<ILogTransaccionReadRepository, LogTransaccionReadRepository>();
 builder.Services.AddScoped<IParametroReadRepository, ParametroReadRepository>();
-
+builder.Services.AddScoped<IDacpacService, DacpacService>();
 // MediatR (CQRS)
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblies(typeof(Program).Assembly, 

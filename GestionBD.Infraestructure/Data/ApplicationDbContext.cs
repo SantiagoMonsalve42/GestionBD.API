@@ -117,6 +117,16 @@ public partial class ApplicationDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("rutaEntregable");
 
+            entity.Property(e => e.NumeroEntrega)
+                .HasColumnType("int")
+                .HasColumnName("numeroEntrega");
+
+
+            entity.Property(e => e.RutaDACPAC)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("rutaDACPAC");
+
             entity.HasOne(d => d.IdEjecucionNavigation).WithMany(p => p.TblEntregables)
                 .HasForeignKey(d => d.IdEjecucion)
                 .OnDelete(DeleteBehavior.ClientSetNull)
