@@ -26,7 +26,7 @@ namespace GestionBD.Application.Entregables.Commands
             if (entregable == null)
                 throw new InvalidOperationException($"No se encontraron detalles de conexión para el entregable {request.idEntregable}");
 
-            // Extraer el DACPAC usando los detalles de conexión
+            // Paso 1: Extraer el DACPAC de la BD origen
             var dacpacPath = await _dacpacService.ExtractDacpacAsync(
                 serverName: $"{entregable.Instancia},{entregable.Puerto}",
                 databaseName: entregable.NombreBD,
@@ -34,12 +34,45 @@ namespace GestionBD.Application.Entregables.Commands
                 password: entregable.Password,
                 cancellationToken: cancellationToken
             );
-            if(dacpacPath == null)
+
+            if (string.IsNullOrWhiteSpace(dacpacPath))
                 throw new InvalidOperationException($"No se pudo extraer el DACPAC para el entregable {request.idEntregable}");
             
-            await _unitOfWork.Entregables.UpdateDACPAC(request.idEntregable, dacpacPath);
+            await _unitOfWork.Entregables.UpdateDACPAC(request.idEntregable, dacpacPath, cancellationToken);
 
-            return dacpacPath;
+            // Paso 2: Desplegar el DACPAC en una BD temporal local
+            string? tempDatabaseName = null;
+            try
+            {
+                               
+                tempDatabaseName = await _dacpacService.DeployDacpacToTemporaryDatabaseAsync(
+                    dacpacPath: dacpacPath,
+                    cancellationToken: cancellationToken
+                );
+
+                // Aquí puedes realizar validaciones o procesos adicionales sobre la BD temporal
+
+                // Por ejemplo: ejecutar scripts de validación, comparar esquemas, etc.
+
+                return $"DACPAC creado en: {dacpacPath}. Base de datos temporal creada: {tempDatabaseName}";
+            }
+            finally
+            {
+                if (!string.IsNullOrWhiteSpace(tempDatabaseName))
+                {
+                    try
+                    {
+                        await _dacpacService.DropTemporaryDatabaseAsync(
+                            databaseName: tempDatabaseName,
+                            cancellationToken: cancellationToken
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error al eliminar BD temporal {tempDatabaseName}: {ex.Message}");
+                    }
+                }
+            }
         }
     }
 }

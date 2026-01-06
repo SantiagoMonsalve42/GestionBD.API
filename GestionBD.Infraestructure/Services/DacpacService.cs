@@ -8,9 +8,13 @@ namespace GestionBD.Infraestructure.Services
     public sealed class DacpacService : IDacpacService
     {
         private readonly string _defaultOutputPath;
-
+        private readonly IConfiguration _configuration;
+        private string serverName => _configuration["DacpacSettings:ServerName"] ?? throw new InvalidOperationException("Database:ServerName no está configurado");
+        private string username => _configuration["DacpacSettings:Username"] ?? throw new InvalidOperationException("Database:Username no está configurado");
+        private string password => _configuration["DacpacSettings:Password"] ?? throw new InvalidOperationException("Database:Password no está configurado");
         public DacpacService(IConfiguration configuration)
         {
+            _configuration = configuration;
             _defaultOutputPath = configuration["FileStorage:BasePathDACPAC"]
             ?? throw new InvalidOperationException("FileStorage:BasePathDACPAC no está configurado");
 
@@ -64,7 +68,121 @@ namespace GestionBD.Infraestructure.Services
 
             return fullPath;
         }
+        public async Task<string> DeployDacpacToTemporaryDatabaseAsync(string dacpacPath,
+                                                                        CancellationToken cancellationToken = default)
+        {
+           
+            if (string.IsNullOrWhiteSpace(dacpacPath))
+                throw new ArgumentException("La ruta del DACPAC no puede estar vacía", nameof(dacpacPath));
 
+            if (!File.Exists(dacpacPath))
+                throw new FileNotFoundException("El archivo DACPAC no existe", dacpacPath);
+            ;
+            if (string.IsNullOrWhiteSpace(serverName))
+                throw new ArgumentException("El nombre del servidor no puede estar vacío", nameof(serverName));
+
+            // Generar nombre único para la BD temporal
+            var tempDatabaseName = $"TempDB_{Guid.NewGuid():N}";
+
+            // Crear la base de datos vacía
+            await CreateEmptyDatabaseAsync(serverName, tempDatabaseName, username, password, cancellationToken);
+
+            try
+            {
+                // Desplegar el DACPAC en la BD temporal
+                var connectionString = BuildConnectionString(serverName, tempDatabaseName, username, password);
+                var dacServices = new DacServices(connectionString);
+
+                dacServices.Message += (sender, e) =>
+                {
+                    Console.WriteLine($"DacFx Deploy: {e.Message}");
+                };
+
+                // Cargar el paquete DACPAC
+                using var dacPackage = DacPackage.Load(dacpacPath);
+
+                // Configurar opciones de despliegue
+                var deployOptions = new DacDeployOptions
+                {
+                    BlockOnPossibleDataLoss = false,
+                    CreateNewDatabase = false, // Ya creamos la BD
+                    IgnorePermissions = true,
+                    IgnoreRoleMembership = true,
+                    IgnoreUserSettingsObjects = true,
+                    IgnoreLoginSids = true,
+                    GenerateSmartDefaults = true,
+                    ScriptDatabaseOptions = false
+                };
+
+                // Ejecutar el despliegue
+                await Task.Run(() =>
+                {
+                    dacServices.Deploy(dacPackage, tempDatabaseName, upgradeExisting: true, options: deployOptions);
+                }, cancellationToken);
+
+                return tempDatabaseName;
+            }
+            catch
+            {
+                // Si falla el despliegue, eliminar la BD temporal
+                try
+                {
+                    await DropTemporaryDatabaseAsync(tempDatabaseName, cancellationToken);
+                }
+                catch
+                {
+                    // Ignorar errores al limpiar
+                }
+                throw;
+            }
+        }
+
+        public async Task DropTemporaryDatabaseAsync( string databaseName,
+                                                      CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(serverName))
+                throw new ArgumentException("El nombre del servidor no puede estar vacío", nameof(serverName));
+
+            if (string.IsNullOrWhiteSpace(databaseName))
+                throw new ArgumentException("El nombre de la base de datos no puede estar vacío", nameof(databaseName));
+
+            // Verificar que es una BD temporal (seguridad)
+            if (!databaseName.StartsWith("TempDB_", StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("Solo se pueden eliminar bases de datos temporales (TempDB_*)");
+
+            var connectionString = BuildConnectionString(serverName, "master", username, password);
+
+            await using var connection = new SqlConnection(connectionString);
+            await connection.OpenAsync(cancellationToken);
+
+            // Cerrar todas las conexiones activas a la BD
+            var killConnectionsCommand = connection.CreateCommand();
+            killConnectionsCommand.CommandText = $@"
+                ALTER DATABASE [{databaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+            ";
+            await killConnectionsCommand.ExecuteNonQueryAsync(cancellationToken);
+
+            // Eliminar la base de datos
+            var dropCommand = connection.CreateCommand();
+            dropCommand.CommandText = $"DROP DATABASE [{databaseName}];";
+            await dropCommand.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        private static async Task CreateEmptyDatabaseAsync(string serverName,
+                                                            string databaseName,
+                                                            string? username,
+                                                            string? password,
+                                                            CancellationToken cancellationToken)
+        {
+            var connectionString = BuildConnectionString(serverName, "master", username, password);
+
+            await using var connection = new SqlConnection(connectionString);
+            await connection.OpenAsync(cancellationToken);
+
+            var command = connection.CreateCommand();
+            command.CommandText = $"CREATE DATABASE [{databaseName}];";
+            await command.ExecuteNonQueryAsync(cancellationToken);
+        }
         private static string BuildConnectionString(string serverName,
                                                      string databaseName,
                                                      string? username,
