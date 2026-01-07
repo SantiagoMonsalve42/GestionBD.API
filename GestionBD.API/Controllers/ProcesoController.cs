@@ -24,4 +24,14 @@ public sealed class ProcesoController : ControllerBase
         var isValid = await _mediator.Send(new DesplegarEntregableEfimeroCommand(idEntregable));
         return Ok(new { isValid });
     }
+
+    [HttpPost("second-step/{idEntregable:decimal}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> PreDeployEntregableFile(decimal idEntregable)
+    {
+        var isValid = await _mediator.Send(new DesplegarEntregableEfimeroCommand(idEntregable));
+        return Ok(isValid);
+    }
 }

@@ -17,15 +17,15 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
     public async Task<IEnumerable<EntregableResponse>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         const string sql = """
-            SELECT 
+              SELECT 
                 ent.idEntregable AS IdEntregable,
                 ent.rutaEntregable AS RutaEntregable,
                 ent.descripcionEntregable AS DescripcionEntregable,
-                ent.idEjecucion AS IdEjecucion,
-                ej.descripcion AS DescripcionEjecucion,
-                ent.nombreRequerimiento AS NombreRequerimiento
+                ent.idEjecucion AS IdEjecucion, 
+            	ent.numeroEntrega as NumeroEntrega,
+            	ent.rutaDACPAC as RutaDACPAC,
+            	ent.temporalBD as TemporalBD
             FROM dbo.tbl_Entregables ent
-            INNER JOIN dbo.tbl_Ejecuciones ej ON ent.idEjecucion = ej.idEjecucion
             ORDER BY ent.idEntregable DESC;
             """;
 
@@ -35,15 +35,15 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
     public async Task<EntregableResponse?> GetByIdAsync(decimal id, CancellationToken cancellationToken = default)
     {
         const string sql = """
-            SELECT 
+              SELECT 
                 ent.idEntregable AS IdEntregable,
                 ent.rutaEntregable AS RutaEntregable,
                 ent.descripcionEntregable AS DescripcionEntregable,
-                ent.idEjecucion AS IdEjecucion,
-                ej.descripcion AS DescripcionEjecucion,
-                ent.nombreRequerimiento AS NombreRequerimiento
+                ent.idEjecucion AS IdEjecucion, 
+            	ent.numeroEntrega as NumeroEntrega,
+            	ent.rutaDACPAC as RutaDACPAC,
+            	ent.temporalBD as TemporalBD
             FROM dbo.tbl_Entregables ent
-            INNER JOIN dbo.tbl_Ejecuciones ej ON ent.idEjecucion = ej.idEjecucion
             WHERE ent.idEntregable = @Id;
             """;
 
