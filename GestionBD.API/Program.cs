@@ -8,6 +8,7 @@ using GestionBD.Infraestructure;
 using GestionBD.Application.Abstractions;
 using GestionBD.Infraestructure.Repositories.Query;
 using GestionBD.Infraestructure.Services;
+using GestionBD.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,7 +35,12 @@ builder.Services.AddScoped<IMotorReadRepository, MotorReadRepository>();
 builder.Services.AddScoped<ILogEventoReadRepository, LogEventoReadRepository>();
 builder.Services.AddScoped<ILogTransaccionReadRepository, LogTransaccionReadRepository>();
 builder.Services.AddScoped<IParametroReadRepository, ParametroReadRepository>();
+
+// Servicios de dominio/aplicación
+builder.Services.AddScoped<EntregableDeploymentService>();
 builder.Services.AddScoped<IDacpacService, DacpacService>();
+builder.Services.AddScoped<IScriptExecutor, SqlServerScriptExecutor>();
+
 // MediatR (CQRS)
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblies(typeof(Program).Assembly, 

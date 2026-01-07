@@ -1,35 +1,37 @@
 ﻿using GestionBD.Application.Abstractions;
 using GestionBD.Application.Contracts.Entregables;
-using GestionBD.Domain;
+using GestionBD.Application.Services;
 using GestionBD.Domain.Exceptions;
 using MediatR;
 
-namespace GestionBD.Application.Entregables.Commands;
-
-public sealed class DesplegarEntregableEfimeroCommandHandler: IRequestHandler<DesplegarEntregableEfimeroCommand, IEnumerable<EntregablePreValidateResponse>>
+namespace GestionBD.Application.Entregables.Commands
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IEntregableReadRepository _entregableReadRepository;
-    private readonly IArtefactoReadRepository _artefactoReadRepository;
-
-    public DesplegarEntregableEfimeroCommandHandler(IUnitOfWork unitOfWork,
-                                                    IEntregableReadRepository entregableReadRepository,
-                                                    IArtefactoReadRepository artefactoReadRepository)
+    public sealed class DesplegarEntregableEfimeroCommandHandler 
+        : IRequestHandler<DesplegarEntregableEfimeroCommand, IEnumerable<EntregablePreValidateResponse>>
     {
-        _unitOfWork = unitOfWork;
-        _entregableReadRepository = entregableReadRepository;
-        _artefactoReadRepository = artefactoReadRepository;
-    }
+        private readonly EntregableDeploymentService _deploymentService;
 
-    public async Task<IEnumerable<EntregablePreValidateResponse>> Handle(DesplegarEntregableEfimeroCommand request, CancellationToken cancellationToken)
-    {
-        var entregable=await _entregableReadRepository.GetByIdAsync(request.idEntregable, cancellationToken);
-        if (entregable is null)
+        public DesplegarEntregableEfimeroCommandHandler(EntregableDeploymentService deploymentService)
         {
-            throw new ValidationException("Entregable",$"El entregable con Id {request.idEntregable} no existe.");
+            _deploymentService = deploymentService;
         }
-        var artefactos=await _artefactoReadRepository.GetByEntregableIdAsync(request.idEntregable, cancellationToken);
-        
-        return new List<EntregablePreValidateResponse>();
+
+        public async Task<IEnumerable<EntregablePreValidateResponse>> Handle(
+                    DesplegarEntregableEfimeroCommand request, 
+                    CancellationToken cancellationToken)
+        {
+            try
+            {
+                return await _deploymentService.DeployAsync(request.idEntregable, cancellationToken);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new ValidationException("Entregable", ex.Message);
+            }
+            catch (FileNotFoundException ex)
+            {
+                throw new ValidationException("Archivo", ex.Message);
+            }
+        }
     }
 }
