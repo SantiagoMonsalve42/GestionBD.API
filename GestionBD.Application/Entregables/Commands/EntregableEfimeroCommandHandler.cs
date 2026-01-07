@@ -4,13 +4,13 @@ using MediatR;
 
 namespace GestionBD.Application.Entregables.Commands
 {
-    public sealed class DesplegarEntregableEfimeroCommandHandler : IRequestHandler<DesplegarEntregableEfimeroCommand, string>
+    public sealed class EntregableEfimeroCommandHandler : IRequestHandler<EntregableEfimeroCommand, string>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IInstanciaReadRepository _instanciaReadRepository;
         private readonly IDacpacService _dacpacService;
 
-        public DesplegarEntregableEfimeroCommandHandler(IUnitOfWork unitOfWork,
+        public EntregableEfimeroCommandHandler(IUnitOfWork unitOfWork,
                                                 IInstanciaReadRepository instanciaReadRepository,
                                                 IDacpacService dacpacService)
         {
@@ -19,7 +19,7 @@ namespace GestionBD.Application.Entregables.Commands
             _dacpacService = dacpacService;
         }
 
-        public async Task<string> Handle(DesplegarEntregableEfimeroCommand request, CancellationToken cancellationToken)
+        public async Task<string> Handle(EntregableEfimeroCommand request, CancellationToken cancellationToken)
         {
             var entregable = await _instanciaReadRepository.GetConnectionDetailsByEntregableIdAsync(request.idEntregable, cancellationToken);
             
