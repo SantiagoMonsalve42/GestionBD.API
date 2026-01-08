@@ -28,11 +28,13 @@ public static class DependencyInjection
         var dacpacSettings = await loader.LoadDacpacSettingsAsync();
         var fileStorageSettings = await loader.LoadFileStorageSettingsAsync();
         var connectionStringsSettings = await loader.LoadConnectionStringsAsync();
+        var openIASettings = await loader.LoadOpenIASettingsAsync();
 
         // 4. Registrar configuraciones con IOptions
         services.AddSingleton(Microsoft.Extensions.Options.Options.Create(dacpacSettings));
         services.AddSingleton(Microsoft.Extensions.Options.Options.Create(fileStorageSettings));
         services.AddSingleton(Microsoft.Extensions.Options.Options.Create(connectionStringsSettings));
+        services.AddSingleton(Microsoft.Extensions.Options.Options.Create(openIASettings));
 
         return services;
     }

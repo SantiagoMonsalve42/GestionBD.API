@@ -1,3 +1,5 @@
+using GestionBD.Application.Abstractions;
+
 namespace GestionBD.Application.Abstractions
 {
     /// <summary>
@@ -5,6 +7,12 @@ namespace GestionBD.Application.Abstractions
     /// </summary>
     public interface IScriptExecutor
     {
-        Task ExecuteAsync(string databaseName, string scriptBatch, CancellationToken cancellationToken = default);
+        Task ExecuteAsync(
+            string databaseName, 
+            string scriptBatch, 
+            string? serverName = null,
+            string? username = null,
+            string? password = null,
+            CancellationToken cancellationToken = default);
     }
 }

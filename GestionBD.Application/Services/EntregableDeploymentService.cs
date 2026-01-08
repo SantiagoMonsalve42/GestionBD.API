@@ -87,7 +87,12 @@ namespace GestionBD.Application.Services
 
                 foreach (var batch in batches)
                 {
-                    await _scriptExecutor.ExecuteAsync(databaseName, batch, cancellationToken);
+                    await _scriptExecutor.ExecuteAsync(databaseName, 
+                                                        batch,
+                                                        null,
+                                                        null,
+                                                        null,
+                                                        cancellationToken);
                 }
 
                 return new EntregablePreValidateResponse(

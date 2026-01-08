@@ -35,4 +35,10 @@ public sealed class VaultConfigurationLoader
             "gestionbd/ConnectionStrings",
             cancellationToken);
     }
+    public async Task<OpenIASettings> LoadOpenIASettingsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _vaultProvider.GetConfigurationAsync<OpenIASettings>(
+            "gestionbd/OpenIASettings",
+            cancellationToken);
+    }
 }

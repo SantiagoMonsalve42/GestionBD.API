@@ -7,4 +7,5 @@ public sealed class FileStorageSettings
 {
     public string BasePath { get; set; } = string.Empty;
     public string BasePathDACPAC { get; set; } = string.Empty;
+    public string BasePathPrompts { get; set; } = string.Empty;
 }
