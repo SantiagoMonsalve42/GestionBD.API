@@ -11,20 +11,23 @@ namespace GestionBD.Application.Services
         private readonly IArtefactoReadRepository _artefactoReadRepository;
         private readonly IScriptExecutor _scriptExecutor;
         private readonly IDacpacService _dacpacService;
+        private readonly IInstanciaReadRepository _instanciaReadRepository;
 
         public EntregableDeploymentService(
             IEntregableReadRepository entregableReadRepository,
             IArtefactoReadRepository artefactoReadRepository,
             IScriptExecutor scriptExecutor,
-            IDacpacService dacpacService)
+            IDacpacService dacpacService,
+            IInstanciaReadRepository instanciaReadRepository)
         {
             _entregableReadRepository = entregableReadRepository;
             _artefactoReadRepository = artefactoReadRepository;
             _scriptExecutor = scriptExecutor;
             _dacpacService = dacpacService;
+            _instanciaReadRepository = instanciaReadRepository;
         }
 
-        public async Task<IEnumerable<EntregablePreValidateResponse>> DeployAsync(
+        public async Task<IEnumerable<EntregablePreValidateResponse>> PreDeployAsync(
             decimal idEntregable,
             CancellationToken cancellationToken = default)
         {
@@ -60,7 +63,12 @@ namespace GestionBD.Application.Services
 
             foreach (var script in scripts)
             {
-                var result = await ExecuteScriptAsync(script, entregable.TemporalBD, cancellationToken);
+                var result = await ExecuteScriptAsync(script, 
+                                                      entregable.TemporalBD,
+                                                      null,
+                                                      null,
+                                                      null,
+                                                      cancellationToken);
                 results.Add(result);
             }
             var someInvalid= results.Exists(x => !x.IsValid);
@@ -75,11 +83,61 @@ namespace GestionBD.Application.Services
 
             return results;
         }
+        public async Task<IEnumerable<EntregablePreValidateResponse>> DeployAsync(
+            decimal idEntregable,
+            CancellationToken cancellationToken = default)
+        {
+            // 1. Obtener el entregable
+            var entregable = await _entregableReadRepository.GetByIdAsync(idEntregable, cancellationToken);
 
+            if (entregable == null)
+                throw new InvalidOperationException($"No se encontró el entregable con ID {idEntregable}");
+            // 1.1 Obtener detalles de conexión
+            var datosInstancia = await _instanciaReadRepository.GetConnectionDetailsByEntregableIdAsync(entregable.IdEntregable, cancellationToken);
+
+            if (datosInstancia == null)
+                throw new InvalidOperationException($"No se encontró conexion parametrizada con ID {idEntregable}");
+
+            // 2. Obtener los artefactos
+            var artefactos = await _artefactoReadRepository.GetByEntregableIdAsync(idEntregable, cancellationToken);
+
+            // 3. Convertir artefactos a entidades del dominio
+            var artefactosEntidades = artefactos.Select(a => new Domain.Entities.TblArtefacto
+            {
+                IdArtefacto = a.IdArtefacto,
+                IdEntregable = a.IdEntregable,
+                OrdenEjecucion = a.OrdenEjecucion,
+                Codificacion = a.Codificacion,
+                NombreArtefacto = a.NombreArtefacto,
+                RutaRelativa = a.RutaRelativa,
+                EsReverso = a.EsReverso
+            }).ToList();
+
+            // 4. Extraer scripts del ZIP usando lógica de dominio
+            var scripts = ScriptDeployment.ExtractScriptsFromZip(entregable.RutaEntregable, artefactosEntidades);
+
+            // 5. Ejecutar cada script
+            var results = new List<EntregablePreValidateResponse>();
+
+            foreach (var script in scripts)
+            {
+                var result = await ExecuteScriptAsync(script,
+                                                      datosInstancia.NombreBD,
+                                                      $"{datosInstancia.Instancia},{datosInstancia.Puerto}",
+                                                      datosInstancia.Usuario,
+                                                      datosInstancia.Password,
+                                                      cancellationToken);
+                results.Add(result);
+            }
+            return results;
+        }
         private async Task<EntregablePreValidateResponse> ExecuteScriptAsync(
             ScriptDeployment script,
-            string databaseName,
-            CancellationToken cancellationToken)
+            string databaseName, 
+            string? serverName = null,
+            string? username = null,
+            string? password = null,
+            CancellationToken cancellationToken = default)
         {
             try
             {
@@ -89,9 +147,9 @@ namespace GestionBD.Application.Services
                 {
                     await _scriptExecutor.ExecuteAsync(databaseName, 
                                                         batch,
-                                                        null,
-                                                        null,
-                                                        null,
+                                                        serverName,
+                                                        username,
+                                                        password,
                                                         cancellationToken);
                 }
 

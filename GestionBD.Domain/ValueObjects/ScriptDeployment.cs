@@ -78,6 +78,13 @@ namespace GestionBD.Domain.ValueObjects
             foreach (var line in lines)
             {
                 var trimmedLine = line.Trim();
+                
+                // Saltar líneas USE [DatabaseName]
+                if (IsUseDatabaseStatement(trimmedLine))
+                {
+                    continue;
+                }
+                
                 if (trimmedLine.Equals("GO", StringComparison.OrdinalIgnoreCase))
                 {
                     if (currentBatch.Length > 0)
@@ -98,6 +105,19 @@ namespace GestionBD.Domain.ValueObjects
             }
 
             return batches.Where(b => !string.IsNullOrWhiteSpace(b));
+        }
+
+        private static bool IsUseDatabaseStatement(string line)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                return false;
+            
+            // Remover punto y coma final si existe
+            var normalizedLine = line.TrimEnd(';').Trim();
+            
+            // Verificar si comienza con USE (case-insensitive)
+            return normalizedLine.StartsWith("USE ", StringComparison.OrdinalIgnoreCase) ||
+                   normalizedLine.StartsWith("USE[", StringComparison.OrdinalIgnoreCase);
         }
 
         private static Encoding GetEncoding(string codificacion)

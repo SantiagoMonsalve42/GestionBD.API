@@ -22,7 +22,7 @@ namespace GestionBD.Application.Entregables.Commands
         {
             try
             {
-                return await _deploymentService.DeployAsync(request.idEntregable, cancellationToken);
+                return await _deploymentService.PreDeployAsync(request.idEntregable, cancellationToken);
             }
             catch (InvalidOperationException ex)
             {
