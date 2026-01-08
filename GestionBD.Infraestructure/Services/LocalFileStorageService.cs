@@ -1,5 +1,7 @@
 using GestionBD.Application.Abstractions;
+using GestionBD.Application.Configuration;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace GestionBD.Infraestructure.Services;
 
@@ -7,9 +9,9 @@ public sealed class LocalFileStorageService : IFileStorageService
 {
     private readonly string _basePath;
 
-    public LocalFileStorageService(IConfiguration configuration)
+    public LocalFileStorageService(IOptions<FileStorageSettings> configuration)
     {
-        _basePath = configuration["FileStorage:BasePath"] 
+        _basePath = configuration.Value.BasePath
             ?? throw new InvalidOperationException("FileStorage:BasePath no está configurado");
         
         // Crear el directorio si no existe

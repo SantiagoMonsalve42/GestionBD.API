@@ -1,6 +1,8 @@
 ﻿using GestionBD.Application.Abstractions;
+using GestionBD.Application.Configuration;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.SqlServer.Dac;
 
 namespace GestionBD.Infraestructure.Services
@@ -8,20 +10,23 @@ namespace GestionBD.Infraestructure.Services
     public sealed class DacpacService : IDacpacService
     {
         private readonly string _defaultOutputPath;
-        private readonly IConfiguration _configuration;
-        private string serverName => _configuration["DacpacSettings:ServerName"] ?? throw new InvalidOperationException("Database:ServerName no está configurado");
-        private string username => _configuration["DacpacSettings:Username"] ?? throw new InvalidOperationException("Database:Username no está configurado");
-        private string password => _configuration["DacpacSettings:Password"] ?? throw new InvalidOperationException("Database:Password no está configurado");
-        public DacpacService(IConfiguration configuration)
+        private readonly IOptions<DacpacSettings> _configuration;
+        private readonly IOptions<FileStorageSettings> _configurationPath;
+        private string serverName => _configuration.Value.ServerName ?? throw new InvalidOperationException("Database:ServerName no está configurado");
+        private string username => _configuration.Value.Username ?? throw new InvalidOperationException("Database:Username no está configurado");
+        private string password => _configuration.Value.Password ?? throw new InvalidOperationException("Database:Password no está configurado");
+        public DacpacService(IOptions<DacpacSettings> configuration, IOptions<FileStorageSettings> configurationPath)
         {
             _configuration = configuration;
-            _defaultOutputPath = configuration["FileStorage:BasePathDACPAC"]
+            _configurationPath = configurationPath;
+            _defaultOutputPath = _configurationPath.Value.BasePathDACPAC
             ?? throw new InvalidOperationException("FileStorage:BasePathDACPAC no está configurado");
 
             if (!Directory.Exists(_defaultOutputPath))
             {
                 Directory.CreateDirectory(_defaultOutputPath);
             }
+
         }
 
         public async Task<string> ExtractDacpacAsync(string serverName,

@@ -1,18 +1,20 @@
 ﻿using GestionBD.Application.Abstractions;
+using GestionBD.Application.Configuration;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace GestionBD.Infraestructure.Services
 {
     public sealed class SqlServerScriptExecutor : IScriptExecutor
     {
-        private readonly IConfiguration _configuration;
-        private string ServerName => _configuration["DacpacSettings:ServerName"] ?? throw new InvalidOperationException("Database:ServerName no está configurado");
-        private string Username => _configuration["DacpacSettings:Username"] ?? throw new InvalidOperationException("Database:Username no está configurado");
-        private string Password => _configuration["DacpacSettings:Password"] ?? throw new InvalidOperationException("Database:Password no está configurado");
+        private readonly IOptions<DacpacSettings> _configuration;
+        private string ServerName => _configuration.Value.ServerName ?? throw new InvalidOperationException("Database:ServerName no está configurado");
+        private string Username => _configuration.Value.Username ?? throw new InvalidOperationException("Database:Username no está configurado");
+        private string Password => _configuration.Value.Password ?? throw new InvalidOperationException("Database:Password no está configurado");
         private const int CommandTimeout = 300; // 5 minutos
 
-        public SqlServerScriptExecutor(IConfiguration configuration)
+        public SqlServerScriptExecutor(IOptions<DacpacSettings> configuration)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }

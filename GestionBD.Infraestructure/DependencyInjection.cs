@@ -1,4 +1,5 @@
 using GestionBD.Application.Abstractions;
+using GestionBD.Application.Configuration;
 using GestionBD.Domain;
 using GestionBD.Infraestructure.Data;
 using GestionBD.Infraestructure.Repositories.Query;
@@ -7,6 +8,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System.Data;
 
 namespace GestionBD.Infraestructure;
@@ -15,13 +17,19 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // DbContext para Commands (EF Core)
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        // DbContext para Commands (EF Core) - usando IOptions
+        services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
+        {
+            var connectionStrings = serviceProvider.GetRequiredService<IOptions<ConnectionStringsSettings>>();
+            options.UseSqlServer(connectionStrings.Value.DefaultConnection);
+        });
 
-        // IDbConnection para Queries (Dapper)
+        // IDbConnection para Queries (Dapper) - usando IOptions
         services.AddScoped<IDbConnection>(sp =>
-            new SqlConnection(configuration.GetConnectionString("DefaultConnection")));
+        {
+            var connectionStrings = sp.GetRequiredService<IOptions<ConnectionStringsSettings>>();
+            return new SqlConnection(connectionStrings.Value.DefaultConnection);
+        });
 
         // Unit of Work (para Commands)
         services.AddScoped<IUnitOfWork, UnitOfWork>();

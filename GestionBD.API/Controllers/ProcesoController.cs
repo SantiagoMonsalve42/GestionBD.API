@@ -21,7 +21,7 @@ public sealed class ProcesoController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ValidateEntregableFile(decimal idEntregable)
     {
-        var isValid = await _mediator.Send(new DesplegarEntregableEfimeroCommand(idEntregable));
+        var isValid = await _mediator.Send(new EntregableEfimeroCommand(idEntregable));
         return Ok(new { isValid });
     }
 
