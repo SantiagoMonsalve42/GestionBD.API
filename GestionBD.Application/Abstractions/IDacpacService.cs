@@ -24,6 +24,7 @@ namespace GestionBD.Application.Abstractions
         /// <param name="cancellationToken">Token de cancelación</param>
         /// <returns>Nombre de la base de datos temporal creada</returns>
         Task<string> DeployDacpacToTemporaryDatabaseAsync(string dacpacPath,
+                                                          string? bdName,
                                                            CancellationToken cancellationToken = default);
 
         /// <summary>

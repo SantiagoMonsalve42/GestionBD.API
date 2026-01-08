@@ -10,15 +10,18 @@ namespace GestionBD.Application.Services
         private readonly IEntregableReadRepository _entregableReadRepository;
         private readonly IArtefactoReadRepository _artefactoReadRepository;
         private readonly IScriptExecutor _scriptExecutor;
+        private readonly IDacpacService _dacpacService;
 
         public EntregableDeploymentService(
             IEntregableReadRepository entregableReadRepository,
             IArtefactoReadRepository artefactoReadRepository,
-            IScriptExecutor scriptExecutor)
+            IScriptExecutor scriptExecutor,
+            IDacpacService dacpacService)
         {
             _entregableReadRepository = entregableReadRepository;
             _artefactoReadRepository = artefactoReadRepository;
             _scriptExecutor = scriptExecutor;
+            _dacpacService = dacpacService;
         }
 
         public async Task<IEnumerable<EntregablePreValidateResponse>> DeployAsync(
@@ -59,9 +62,15 @@ namespace GestionBD.Application.Services
             {
                 var result = await ExecuteScriptAsync(script, entregable.TemporalBD, cancellationToken);
                 results.Add(result);
-
-                if (!result.IsValid)
-                    break; // Detener en caso de error
+            }
+            var someInvalid= results.Exists(x => !x.IsValid);
+            if(someInvalid && entregable.RutaDACPAC!= null)
+            {
+                await _dacpacService.DeployDacpacToTemporaryDatabaseAsync(
+                 dacpacPath: entregable.RutaDACPAC,
+                 bdName: entregable.TemporalBD,
+                 cancellationToken: cancellationToken
+                );
             }
 
             return results;

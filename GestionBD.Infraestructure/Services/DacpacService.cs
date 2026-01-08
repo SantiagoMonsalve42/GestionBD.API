@@ -74,6 +74,7 @@ namespace GestionBD.Infraestructure.Services
             return fullPath;
         }
         public async Task<string> DeployDacpacToTemporaryDatabaseAsync(string dacpacPath,
+                                                                       string? bdName = null,
                                                                         CancellationToken cancellationToken = default)
         {
            
@@ -87,11 +88,14 @@ namespace GestionBD.Infraestructure.Services
                 throw new ArgumentException("El nombre del servidor no puede estar vacío", nameof(serverName));
 
             // Generar nombre único para la BD temporal
-            var tempDatabaseName = $"TempDB_{Guid.NewGuid():N}";
-
-            // Crear la base de datos vacía
-            await CreateEmptyDatabaseAsync(serverName, tempDatabaseName, username, password, cancellationToken);
-
+            var tempDatabaseName = bdName;
+            if (bdName == null)
+            {
+                // Crear la base de datos vacía
+                tempDatabaseName = $"TempDB_{Guid.NewGuid():N}";
+                await CreateEmptyDatabaseAsync(serverName, tempDatabaseName, username, password, cancellationToken);
+            }
+            
             try
             {
                 // Desplegar el DACPAC en la BD temporal
@@ -116,7 +120,8 @@ namespace GestionBD.Infraestructure.Services
                     IgnoreUserSettingsObjects = true,
                     IgnoreLoginSids = true,
                     GenerateSmartDefaults = true,
-                    ScriptDatabaseOptions = false
+                    ScriptDatabaseOptions = false,
+                    DropObjectsNotInSource = true
                 };
 
                 // Ejecutar el despliegue

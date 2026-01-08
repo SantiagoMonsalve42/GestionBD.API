@@ -44,6 +44,7 @@ namespace GestionBD.Application.Entregables.Commands
             string? tempDatabaseName = null;
             tempDatabaseName = await _dacpacService.DeployDacpacToTemporaryDatabaseAsync(
                     dacpacPath: dacpacPath,
+                    bdName: null,
                     cancellationToken: cancellationToken
                 );
 
