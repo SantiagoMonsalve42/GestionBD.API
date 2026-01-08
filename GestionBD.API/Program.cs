@@ -1,11 +1,14 @@
 using GestionBD.API.Extensions;
 using GestionBD.Application;
 using GestionBD.Infraestructure;
+using GestionBD.Infraestructure.ExternalServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Registrar servicios por capas
 builder.Services.AddInfrastructure(builder.Configuration);
+
+await builder.Services.AddExternalServicesAsync(builder.Configuration);
+
 builder.Services.AddApplication();
 builder.Services.AddPresentation();
 

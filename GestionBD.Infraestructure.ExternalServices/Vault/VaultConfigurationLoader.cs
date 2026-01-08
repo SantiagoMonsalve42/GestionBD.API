@@ -1,0 +1,38 @@
+using GestionBD.Application.Abstractions;
+using GestionBD.Application.Configuration;
+
+namespace GestionBD.Infraestructure.ExternalServices.Vault;
+
+/// <summary>
+/// Cargador de configuraciones desde Vault al inicio de la aplicación
+/// </summary>
+public sealed class VaultConfigurationLoader
+{
+    private readonly IVaultConfigurationProvider _vaultProvider;
+
+    public VaultConfigurationLoader(IVaultConfigurationProvider vaultProvider)
+    {
+        _vaultProvider = vaultProvider;
+    }
+
+    public async Task<DacpacSettings> LoadDacpacSettingsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _vaultProvider.GetConfigurationAsync<DacpacSettings>(
+            "gestionbd/DacpacSettings",
+            cancellationToken);
+    }
+
+    public async Task<FileStorageSettings> LoadFileStorageSettingsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _vaultProvider.GetConfigurationAsync<FileStorageSettings>(
+            "gestionbd/FileStorage",
+            cancellationToken);
+    }
+
+    public async Task<ConnectionStringsSettings> LoadConnectionStringsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _vaultProvider.GetConfigurationAsync<ConnectionStringsSettings>(
+            "gestionbd/ConnectionStrings",
+            cancellationToken);
+    }
+}
