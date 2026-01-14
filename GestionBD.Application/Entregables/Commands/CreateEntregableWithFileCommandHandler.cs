@@ -1,10 +1,11 @@
-using MediatR;
-using GestionBD.Domain;
-using GestionBD.Domain.Entities;
-using GestionBD.Domain.ValueObjects;
-using GestionBD.Domain.Exceptions;
 using GestionBD.Application.Abstractions.Readers;
 using GestionBD.Application.Abstractions.Services;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
+using GestionBD.Domain.Enum;
+using GestionBD.Domain.Exceptions;
+using GestionBD.Domain.ValueObjects;
+using MediatR;
 
 namespace GestionBD.Application.Entregables.Commands;
 
@@ -36,10 +37,20 @@ public sealed class CreateEntregableWithFileCommandHandler : IRequestHandler<Cre
         {
             int cantidadEntregas = (await _entregableReadRepository.GetEntregablesByEjecucion(command.Request.IdEjecucion)) + 1;
             var ejecucion = await _ejecucionReadRepository.GetByIdAsync(command.Request.IdEjecucion, cancellationToken);
-
+            
             if (ejecucion == null)
             {
                 throw new ValidationException("IdEjecucion", "La ejecución no existe");
+            }
+            var entregableExistente = await _entregableReadRepository.GetAllByIdEjecucionAsync(
+                command.Request.IdEjecucion,
+                cancellationToken);
+            
+
+            if (entregableExistente.Any(x=> x.IdEjecucion != (int)EstadoEntregaEnum.Cerrado))
+            {
+
+                throw new ValidationException("EntregableExistente", "Ya existe un entregable abierto, primero cierrelo antes de crear otro.");
             }
 
             var archivoEntregable = ArchivoEntregable.Crear(
@@ -66,7 +77,8 @@ public sealed class CreateEntregableWithFileCommandHandler : IRequestHandler<Cre
                     RutaEntregable = rutaEntregable,
                     DescripcionEntregable = command.Request.DescripcionEntregable,
                     IdEjecucion = command.Request.IdEjecucion,
-                    NumeroEntrega = cantidadEntregas
+                    NumeroEntrega = cantidadEntregas,
+                    IdEstado = (int)EstadoEntregaEnum.Creado
                 };
 
                 _unitOfWork.Entregables.Add(entregable);

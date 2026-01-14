@@ -1,6 +1,7 @@
 using MediatR;
 using GestionBD.Domain;
 using GestionBD.Domain.Entities;
+using GestionBD.Domain.Enum;
 
 namespace GestionBD.Application.Entregables.Commands;
 
@@ -20,7 +21,8 @@ public sealed class CreateEntregableCommandHandler : IRequestHandler<CreateEntre
             RutaEntregable = command.Request.RutaEntregable,
             DescripcionEntregable = command.Request.DescripcionEntregable,
             IdEjecucion = command.Request.IdEjecucion,
-            NumeroEntrega = command.Request.NumeroEntrega
+            NumeroEntrega = command.Request.NumeroEntrega,
+            IdEstado = (int)EstadoEntregaEnum.Creado
         };
 
         _unitOfWork.Entregables.Add(entregable);

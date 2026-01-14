@@ -32,23 +32,27 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
         return await _connection.QueryAsync<EntregableResponse>(sql);
     }
 
-    public async Task<IEnumerable<EntregableResponse>> GetAllByIdEjecucionAsync(decimal idEjecucion,CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<EntregableResponseEstado>> GetAllByIdEjecucionAsync(decimal idEjecucion,CancellationToken cancellationToken = default)
     {
         const string sql = """
-              SELECT 
+                SELECT 
                 ent.idEntregable AS IdEntregable,
                 ent.rutaEntregable AS RutaEntregable,
                 ent.descripcionEntregable AS DescripcionEntregable,
                 ent.idEjecucion AS IdEjecucion, 
-            	ent.numeroEntrega as NumeroEntrega,
-            	ent.rutaDACPAC as RutaDACPAC,
-            	ent.temporalBD as TemporalBD
+               	ent.numeroEntrega as NumeroEntrega,
+               	ent.rutaDACPAC as RutaDACPAC,
+               	ent.temporalBD as TemporalBD,
+            	est.descripcionEstado as EstadoEntrega,
+            	est.idEstado as EstadoEntregaId
             FROM dbo.tbl_Entregables ent
+            JOIN dbo.tbl_EstadoEntrega est
+            on ent.idEstado = est.idEstado
             where ent.idEjecucion = @Id
             ORDER BY ent.idEntregable DESC;
             """;
 
-        return await _connection.QueryAsync<EntregableResponse>(sql, new { Id = idEjecucion });
+        return await _connection.QueryAsync<EntregableResponseEstado>(sql, new { Id = idEjecucion });
     }
 
     public async Task<EntregableResponse?> GetByIdAsync(decimal id, CancellationToken cancellationToken = default)

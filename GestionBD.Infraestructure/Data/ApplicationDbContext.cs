@@ -127,6 +127,10 @@ public partial class ApplicationDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("rutaDACPAC");
 
+            entity.Property(e => e.IdEstado)
+                .HasColumnType("int")
+                .HasColumnName("idEstado");
+
             entity.HasOne(d => d.IdEjecucionNavigation).WithMany(p => p.TblEntregables)
                 .HasForeignKey(d => d.IdEjecucion)
                 .OnDelete(DeleteBehavior.ClientSetNull)
