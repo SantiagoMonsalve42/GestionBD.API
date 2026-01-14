@@ -1,4 +1,4 @@
-using GestionBD.Application.Abstractions;
+using GestionBD.Application.Abstractions.Config;
 using GestionBD.Application.Configuration;
 
 namespace GestionBD.Infraestructure.ExternalServices.Vault;

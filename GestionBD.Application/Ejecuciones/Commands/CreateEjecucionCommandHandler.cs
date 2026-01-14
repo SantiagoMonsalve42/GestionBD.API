@@ -1,8 +1,8 @@
 using MediatR;
 using GestionBD.Domain;
 using GestionBD.Domain.Entities;
-using GestionBD.Application.Abstractions;
 using GestionBD.Domain.Exceptions;
+using GestionBD.Application.Abstractions.Readers;
 
 namespace GestionBD.Application.Ejecuciones.Commands;
 

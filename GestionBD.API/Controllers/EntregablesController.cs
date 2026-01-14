@@ -48,6 +48,16 @@ public sealed class EntregablesController : ControllerBase
         var entregables = await _mediator.Send(new GetAllEntregablesQuery());
         return Ok(entregables);
     }
+    /// <summary>
+    /// Obtiene todos los entregables por IdEjecucion
+    /// </summary>
+    [HttpGet("Ejecucion/{idEjecucion:decimal}")]
+    [ProducesResponseType(typeof(IEnumerable<EntregableResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAllByIdEjecucion(decimal idEjecucion)
+    {
+        var entregables = await _mediator.Send(new GetAllEntregablesByEjecucionIdQuery(idEjecucion));
+        return Ok(entregables);
+    }
 
     /// <summary>
     /// Obtiene un entregable por ID

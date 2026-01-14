@@ -22,7 +22,7 @@ public sealed class CreateInstanciaCommandHandler : IRequestHandler<CreateInstan
             Puerto = command.Request.Puerto,
             Usuario = command.Request.Usuario,
             Password = command.Request.Password,
-            NombreDB = command.Request.NombreDB
+            NombreDB = command.Request.nombreBD
         };
 
         _unitOfWork.Instancias.Add(instancia);

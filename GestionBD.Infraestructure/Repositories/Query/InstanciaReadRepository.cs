@@ -1,6 +1,6 @@
 using System.Data;
 using Dapper;
-using GestionBD.Application.Abstractions;
+using GestionBD.Application.Abstractions.Readers;
 using GestionBD.Application.Contracts.Instancias;
 
 namespace GestionBD.Infraestructure.Repositories.Query;

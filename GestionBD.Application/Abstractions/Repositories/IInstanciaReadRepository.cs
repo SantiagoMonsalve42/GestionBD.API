@@ -1,6 +1,6 @@
 using GestionBD.Application.Contracts.Instancias;
 
-namespace GestionBD.Application.Abstractions;
+namespace GestionBD.Application.Abstractions.Readers;
 
 public interface IInstanciaReadRepository : IReadRepository<InstanciaResponse>
 {

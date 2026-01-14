@@ -1,4 +1,4 @@
-namespace GestionBD.Application.Abstractions;
+namespace GestionBD.Application.Abstractions.Services;
 
 public interface IFileStorageService
 {

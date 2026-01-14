@@ -1,4 +1,4 @@
-using GestionBD.Application.Abstractions;
+using GestionBD.Application.Abstractions.Config;
 using System.Text.Json;
 using VaultSharp;
 using VaultSharp.V1.AuthMethods.Token;

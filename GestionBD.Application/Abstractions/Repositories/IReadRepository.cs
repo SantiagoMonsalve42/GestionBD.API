@@ -1,4 +1,4 @@
-namespace GestionBD.Application.Abstractions;
+namespace GestionBD.Application.Abstractions.Readers;
 
 public interface IReadRepository<TResponse> where TResponse : class
 {

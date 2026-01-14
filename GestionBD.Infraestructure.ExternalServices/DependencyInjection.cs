@@ -1,4 +1,4 @@
-using GestionBD.Application.Abstractions;
+using GestionBD.Application.Abstractions.Config;
 using GestionBD.Infraestructure.ExternalServices.Vault;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

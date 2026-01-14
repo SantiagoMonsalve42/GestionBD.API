@@ -1,4 +1,5 @@
-using GestionBD.Application.Abstractions;
+using GestionBD.Application.Abstractions.Readers;
+using GestionBD.Application.Abstractions.Services;
 using GestionBD.Application.Contracts.Entregables;
 using GestionBD.Domain.ValueObjects;
 using Microsoft.Data.SqlClient;

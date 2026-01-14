@@ -1,6 +1,6 @@
 using GestionBD.Application.Contracts.Artefactos;
 
-namespace GestionBD.Application.Abstractions;
+namespace GestionBD.Application.Abstractions.Readers;
 
 public interface IArtefactoReadRepository : IReadRepository<ArtefactoResponse>
 {

@@ -2,8 +2,9 @@ using MediatR;
 using GestionBD.Domain;
 using GestionBD.Domain.Entities;
 using GestionBD.Domain.ValueObjects;
-using GestionBD.Application.Abstractions;
 using GestionBD.Domain.Exceptions;
+using GestionBD.Application.Abstractions.Readers;
+using GestionBD.Application.Abstractions.Services;
 
 namespace GestionBD.Application.Entregables.Commands;
 

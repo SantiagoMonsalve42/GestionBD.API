@@ -1,4 +1,6 @@
-using GestionBD.Application.Abstractions;
+using GestionBD.Application.Abstractions.Readers;
+using GestionBD.Application.Abstractions.Repositories;
+using GestionBD.Application.Abstractions.Services;
 using GestionBD.Application.Configuration;
 using GestionBD.Domain;
 using GestionBD.Infraestructure.Data;
@@ -47,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped<ILogEventoReadRepository, LogEventoReadRepository>();
         services.AddScoped<ILogTransaccionReadRepository, LogTransaccionReadRepository>();
         services.AddScoped<IParametroReadRepository, ParametroReadRepository>();
+        services.AddScoped<IStatisticsRepository, StatisticsRepository>();
 
         // Script Executor
         services.AddScoped<IScriptExecutor, SqlServerScriptExecutor>();

@@ -1,6 +1,6 @@
 using MediatR;
-using GestionBD.Application.Abstractions;
 using GestionBD.Application.Contracts.Parametros;
+using GestionBD.Application.Abstractions.Readers;
 
 namespace GestionBD.Application.Parametros.Queries;
 

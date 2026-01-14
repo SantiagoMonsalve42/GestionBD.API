@@ -1,4 +1,4 @@
-using GestionBD.Application.Abstractions;
+using GestionBD.Application.Abstractions.Services;
 using GestionBD.Application.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;

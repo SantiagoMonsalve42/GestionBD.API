@@ -27,5 +27,5 @@ public sealed record UpdateInstanciaRequest(
 
     [Required(ErrorMessage = "El nombre de la base de datos es requerida")]
     [MaxLength(150, ErrorMessage = "El nombre de la base de datos no puede exceder 150 caracteres")]
-    string NombreDB
+    string nombreBD
 );

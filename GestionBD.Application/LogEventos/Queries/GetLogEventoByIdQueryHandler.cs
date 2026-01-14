@@ -1,6 +1,6 @@
 using MediatR;
-using GestionBD.Application.Abstractions;
 using GestionBD.Application.Contracts.LogEventos;
+using GestionBD.Application.Abstractions.Readers;
 
 namespace GestionBD.Application.LogEventos.Queries;
 

@@ -1,4 +1,5 @@
-﻿using GestionBD.Application.Abstractions;
+﻿using GestionBD.Application.Abstractions.Readers;
+using GestionBD.Application.Abstractions.Services;
 using GestionBD.Domain;
 using MediatR;
 

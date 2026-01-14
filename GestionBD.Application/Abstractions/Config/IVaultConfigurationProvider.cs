@@ -1,4 +1,4 @@
-namespace GestionBD.Application.Abstractions;
+namespace GestionBD.Application.Abstractions.Config;
 
 /// <summary>
 /// Proveedor de configuración desde HashiCorp Vault

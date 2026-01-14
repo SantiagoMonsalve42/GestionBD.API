@@ -1,6 +1,6 @@
 using System.Data;
 using Dapper;
-using GestionBD.Application.Abstractions;
+using GestionBD.Application.Abstractions.Readers;
 using GestionBD.Application.Contracts.Entregables;
 
 namespace GestionBD.Infraestructure.Repositories.Query;
@@ -30,6 +30,25 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
             """;
 
         return await _connection.QueryAsync<EntregableResponse>(sql);
+    }
+
+    public async Task<IEnumerable<EntregableResponse>> GetAllByIdEjecucionAsync(decimal idEjecucion,CancellationToken cancellationToken = default)
+    {
+        const string sql = """
+              SELECT 
+                ent.idEntregable AS IdEntregable,
+                ent.rutaEntregable AS RutaEntregable,
+                ent.descripcionEntregable AS DescripcionEntregable,
+                ent.idEjecucion AS IdEjecucion, 
+            	ent.numeroEntrega as NumeroEntrega,
+            	ent.rutaDACPAC as RutaDACPAC,
+            	ent.temporalBD as TemporalBD
+            FROM dbo.tbl_Entregables ent
+            where ent.idEjecucion = @Id
+            ORDER BY ent.idEntregable DESC;
+            """;
+
+        return await _connection.QueryAsync<EntregableResponse>(sql, new { Id = idEjecucion });
     }
 
     public async Task<EntregableResponse?> GetByIdAsync(decimal id, CancellationToken cancellationToken = default)

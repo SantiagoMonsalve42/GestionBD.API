@@ -1,6 +1,4 @@
-using GestionBD.Application.Abstractions;
-
-namespace GestionBD.Application.Abstractions
+namespace GestionBD.Application.Abstractions.Services
 {
     /// <summary>
     /// Ejecutor de scripts SQL (detalle técnico de infraestructura)

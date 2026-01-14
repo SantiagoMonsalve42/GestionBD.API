@@ -1,6 +1,6 @@
 using GestionBD.Application.Contracts.Ejecuciones;
 
-namespace GestionBD.Application.Abstractions;
+namespace GestionBD.Application.Abstractions.Readers;
 
 public interface IEjecucionReadRepository : IReadRepository<EjecucionResponse>
 {
