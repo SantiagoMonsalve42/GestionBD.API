@@ -103,4 +103,39 @@ public sealed class ArtefactosController : ControllerBase
             return NotFound(new { message = ex.Message });
         }
     }
+    [HttpGet("entregable/{id:decimal}")]
+    [ProducesResponseType(typeof(IEnumerable<ArtefactoResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetByEntregableId(decimal id)
+    {
+        var artefacto = await _mediator.Send(new GetArtefactoByEntregableIdQuery(id));
+
+        if (artefacto == null)
+            return NotFound(new { message = $"Artefactos con ID {id} no encontrado." });
+
+        return Ok(artefacto);
+    }
+
+    /// <summary>
+    /// Actualiza un artefacto existente
+    /// </summary>
+    [HttpPut("cambiarOrden")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateRangeOrder([FromBody] List<ArtefactoChangeOrder> request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            await _mediator.Send(new ChangeOrderArtefactoCommand(request));
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+    }
 }

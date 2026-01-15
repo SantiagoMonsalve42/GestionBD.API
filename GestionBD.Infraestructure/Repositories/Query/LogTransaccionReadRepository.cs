@@ -1,6 +1,6 @@
 using System.Data;
 using Dapper;
-using GestionBD.Application.Abstractions.Readers;
+using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Contracts.LogTransacciones;
 
 namespace GestionBD.Infraestructure.Repositories.Query;

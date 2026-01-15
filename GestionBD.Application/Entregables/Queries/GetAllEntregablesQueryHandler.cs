@@ -1,10 +1,10 @@
 using MediatR;
 using GestionBD.Application.Contracts.Entregables;
-using GestionBD.Application.Abstractions.Readers;
+using GestionBD.Application.Abstractions.Repositories.Query;
 
 namespace GestionBD.Application.Entregables.Queries;
 
-public sealed class GetAllEntregablesQueryHandler : IRequestHandler<GetAllEntregablesQuery, IEnumerable<EntregableResponse>>
+public sealed class GetAllEntregablesQueryHandler : IRequestHandler<GetAllEntregablesQuery, IEnumerable<EntregableResponseEstado>>
 {
     private readonly IEntregableReadRepository _repository;
 
@@ -13,7 +13,7 @@ public sealed class GetAllEntregablesQueryHandler : IRequestHandler<GetAllEntreg
         _repository = repository;
     }
 
-    public async Task<IEnumerable<EntregableResponse>> Handle(GetAllEntregablesQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<EntregableResponseEstado>> Handle(GetAllEntregablesQuery request, CancellationToken cancellationToken)
     {
         return await _repository.GetAllAsync(cancellationToken);
     }

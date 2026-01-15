@@ -1,5 +1,5 @@
 ﻿using GestionBD.Domain.Entities;
-namespace GestionBD.Domain.Repositories;
+namespace GestionBD.Application.Abstractions.Repositories.Command;
 public interface IInstanciaRepository : IRepository<TblInstancia>
 {
 }

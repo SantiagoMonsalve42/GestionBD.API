@@ -1,4 +1,6 @@
-﻿using GestionBD.Domain.Repositories;
+﻿
+
+using GestionBD.Application.Abstractions.Repositories.Command;
 
 namespace GestionBD.Domain;
 

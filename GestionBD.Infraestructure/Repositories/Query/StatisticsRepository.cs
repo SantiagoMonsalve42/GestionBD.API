@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using GestionBD.Application.Abstractions.Repositories;
+using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.DTO;
 using System.Data;
 

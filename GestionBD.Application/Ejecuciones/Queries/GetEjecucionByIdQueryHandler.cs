@@ -1,6 +1,6 @@
 using MediatR;
 using GestionBD.Application.Contracts.Ejecuciones;
-using GestionBD.Application.Abstractions.Readers;
+using GestionBD.Application.Abstractions.Repositories.Query;
 
 namespace GestionBD.Application.Ejecuciones.Queries;
 

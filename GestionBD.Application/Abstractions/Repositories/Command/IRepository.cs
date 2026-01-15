@@ -1,4 +1,4 @@
-﻿namespace GestionBD.Domain.Repositories;
+﻿namespace GestionBD.Application.Abstractions.Repositories.Command;
 public interface IRepository<TEntity> where TEntity : class
 {
     void Add(TEntity entity);

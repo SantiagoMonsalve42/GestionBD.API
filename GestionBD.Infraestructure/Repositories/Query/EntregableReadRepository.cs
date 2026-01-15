@@ -1,6 +1,6 @@
 using System.Data;
 using Dapper;
-using GestionBD.Application.Abstractions.Readers;
+using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Contracts.Entregables;
 
 namespace GestionBD.Infraestructure.Repositories.Query;
@@ -14,7 +14,7 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
         _connection = connection;
     }
 
-    public async Task<IEnumerable<EntregableResponse>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<EntregableResponseEstado>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         const string sql = """
               SELECT 
@@ -24,12 +24,16 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
                 ent.idEjecucion AS IdEjecucion, 
             	ent.numeroEntrega as NumeroEntrega,
             	ent.rutaDACPAC as RutaDACPAC,
-            	ent.temporalBD as TemporalBD
+            	ent.temporalBD as TemporalBD,
+                est.descripcionEstado as EstadoEntrega,
+            	est.idEstado as EstadoEntregaId
             FROM dbo.tbl_Entregables ent
+            JOIN dbo.tbl_EstadoEntrega est
+            on ent.idEstado = est.idEstado
             ORDER BY ent.idEntregable DESC;
             """;
 
-        return await _connection.QueryAsync<EntregableResponse>(sql);
+        return await _connection.QueryAsync<EntregableResponseEstado>(sql);
     }
 
     public async Task<IEnumerable<EntregableResponseEstado>> GetAllByIdEjecucionAsync(decimal idEjecucion,CancellationToken cancellationToken = default)
@@ -55,7 +59,7 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
         return await _connection.QueryAsync<EntregableResponseEstado>(sql, new { Id = idEjecucion });
     }
 
-    public async Task<EntregableResponse?> GetByIdAsync(decimal id, CancellationToken cancellationToken = default)
+    public async Task<EntregableResponseEstado?> GetByIdAsync(decimal id, CancellationToken cancellationToken = default)
     {
         const string sql = """
               SELECT 
@@ -65,12 +69,16 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
                 ent.idEjecucion AS IdEjecucion, 
             	ent.numeroEntrega as NumeroEntrega,
             	ent.rutaDACPAC as RutaDACPAC,
-            	ent.temporalBD as TemporalBD
+            	ent.temporalBD as TemporalBD,
+                est.descripcionEstado as EstadoEntrega,
+            	est.idEstado as EstadoEntregaId
             FROM dbo.tbl_Entregables ent
+            JOIN dbo.tbl_EstadoEntrega est
+            on ent.idEstado = est.idEstado
             WHERE ent.idEntregable = @Id;
             """;
 
-        return await _connection.QueryFirstOrDefaultAsync<EntregableResponse>(sql, new { Id = id });
+        return await _connection.QueryFirstOrDefaultAsync<EntregableResponseEstado>(sql, new { Id = id });
     }
 
     public async Task<int> GetEntregablesByEjecucion(decimal idEjecucion)

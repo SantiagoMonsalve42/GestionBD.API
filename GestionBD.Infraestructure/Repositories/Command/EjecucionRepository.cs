@@ -1,4 +1,4 @@
-﻿using GestionBD.Domain.Repositories;
+﻿using GestionBD.Application.Abstractions.Repositories.Command;
 using GestionBD.Domain.Entities;
 using GestionBD.Infraestructure.Data;
 

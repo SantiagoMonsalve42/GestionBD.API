@@ -1,6 +1,6 @@
 ﻿using GestionBD.Domain.Entities;
 
-namespace GestionBD.Domain.Repositories;
+namespace GestionBD.Application.Abstractions.Repositories.Command;
 
 public interface IEntregableRepository : IRepository<TblEntregable>
 {

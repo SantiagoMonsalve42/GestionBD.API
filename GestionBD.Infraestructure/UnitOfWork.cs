@@ -1,7 +1,6 @@
 ﻿using GestionBD.Domain;
-using GestionBD.Domain.Repositories;
+using GestionBD.Application.Abstractions.Repositories.Command;
 using GestionBD.Infraestructure.Data;
-using GestionBD.Infraestructure.Repositories;
 using GestionBD.Infraestructure.Repositories.Command;
 using Microsoft.EntityFrameworkCore.Storage;
 

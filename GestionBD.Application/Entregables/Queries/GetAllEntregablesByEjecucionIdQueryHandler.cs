@@ -1,4 +1,4 @@
-﻿using GestionBD.Application.Abstractions.Readers;
+﻿using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Contracts.Entregables;
 using MediatR;
 

@@ -1,4 +1,4 @@
-using GestionBD.Application.Abstractions.Readers;
+using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Abstractions.Services;
 using GestionBD.Domain;
 using GestionBD.Domain.Entities;
