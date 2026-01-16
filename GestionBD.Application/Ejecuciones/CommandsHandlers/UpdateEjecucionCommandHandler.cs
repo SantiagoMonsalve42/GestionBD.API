@@ -1,0 +1,32 @@
+using MediatR;
+using GestionBD.Domain;
+using GestionBD.Domain.Entities;
+using GestionBD.Application.Ejecuciones.Commands;
+
+namespace GestionBD.Application.Ejecuciones.CommandsHandlers;
+
+public sealed class UpdateEjecucionCommandHandler : IRequestHandler<UpdateEjecucionCommand, Unit>
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public UpdateEjecucionCommandHandler(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<Unit> Handle(UpdateEjecucionCommand command, CancellationToken cancellationToken)
+    {
+        var ejecucion = await _unitOfWork.FindEntityAsync<TblEjecucione>(command.Request.IdEjecucion, cancellationToken);
+
+        if (ejecucion == null)
+            throw new KeyNotFoundException($"Ejecución con ID {command.Request.IdEjecucion} no encontrada.");
+
+        ejecucion.IdInstancia = command.Request.IdInstancia;
+        ejecucion.Descripcion = command.Request.Descripcion;
+
+        _unitOfWork.Ejecuciones.Update(ejecucion);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Unit.Value;
+    }
+}

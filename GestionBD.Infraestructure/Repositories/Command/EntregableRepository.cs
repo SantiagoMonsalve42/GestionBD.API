@@ -1,5 +1,6 @@
 ﻿using GestionBD.Application.Abstractions.Repositories.Command;
 using GestionBD.Domain.Entities;
+using GestionBD.Domain.Enum;
 using GestionBD.Infraestructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,5 +19,13 @@ public sealed class EntregableRepository : Repository<TblEntregable>, IEntregabl
                 .SetProperty(b => b.RutaDACPAC, rutaDacpac)
                 .SetProperty(c => c.TemporalBD, temporalBD), cancellationToken);
         return result > 0;
+    }
+
+    public async Task<bool> UpdateEstado(decimal idEntregable, EstadoEntregaEnum estadoEntregaEnum, CancellationToken cancellationToken = default)
+    {
+        var entregable = await _context.TblEntregables.FirstOrDefaultAsync(x => x.IdEntregable == idEntregable);
+        entregable.IdEstado = (decimal)estadoEntregaEnum;
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;
     }
 }
