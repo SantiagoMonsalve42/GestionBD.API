@@ -61,7 +61,7 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
             }catch(Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync();
-                throw new InvalidOperationException("No se pudo iniciar la transacción.", ex);
+                throw new InvalidOperationException("No se pudo iniciar la transaccion.", ex);
             }
         }
     }

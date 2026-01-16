@@ -60,7 +60,7 @@ public sealed class InstanciaReadRepository : IInstanciaReadRepository
                 en.temporalBD AS TemporalBD
               from [dbo].[tbl_Instancias] i
               join dbo.tbl_Ejecuciones e
-              on i.idInstancia = e.idEjecucion
+              on i.idInstancia = e.idInstancia
               join dbo.tbl_Entregables en
               on en.idEjecucion = e.idEjecucion
               where en.idEntregable = @Id
