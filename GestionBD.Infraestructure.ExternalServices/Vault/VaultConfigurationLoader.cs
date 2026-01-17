@@ -41,4 +41,10 @@ public sealed class VaultConfigurationLoader
             "gestionbd/OpenIASettings",
             cancellationToken);
     }
+    public async Task<JWTSettings> LoadJWTSettingsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _vaultProvider.GetConfigurationAsync<JWTSettings>(
+            "gestionbd/JWTSettings",
+            cancellationToken);
+    }
 }
