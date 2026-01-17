@@ -1,13 +1,15 @@
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
+using GestionBD.Application.Contracts.Entregables;
 using GestionBD.Application.Entregables.Commands;
 using GestionBD.Application.Entregables.Queries;
-using GestionBD.Application.Contracts.Entregables;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GestionBD.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public sealed class EntregablesController : ControllerBase
 {
     private readonly IMediator _mediator;

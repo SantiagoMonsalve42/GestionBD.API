@@ -35,16 +35,18 @@ public sealed class VaultConfigurationLoader
             "gestionbd/ConnectionStrings",
             cancellationToken);
     }
+
     public async Task<OpenIASettings> LoadOpenIASettingsAsync(CancellationToken cancellationToken = default)
     {
         return await _vaultProvider.GetConfigurationAsync<OpenIASettings>(
             "gestionbd/OpenIASettings",
             cancellationToken);
     }
-    public async Task<JWTSettings> LoadJWTSettingsAsync(CancellationToken cancellationToken = default)
+
+    public async Task<KeycloakSettings> LoadKeycloakSettingsAsync(CancellationToken cancellationToken = default)
     {
-        return await _vaultProvider.GetConfigurationAsync<JWTSettings>(
-            "gestionbd/JWTSettings",
+        return await _vaultProvider.GetConfigurationAsync<KeycloakSettings>(
+            "gestionbd/KeycloakSettings",
             cancellationToken);
     }
 }

@@ -1,11 +1,13 @@
 ﻿using GestionBD.Application.Entregables.Commands;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GestionBD.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public sealed class ProcesoController : ControllerBase
 {
     private readonly IMediator _mediator;

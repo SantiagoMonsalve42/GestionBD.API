@@ -40,7 +40,33 @@ public static class PresentationDependencyInjection
             {
                 Title = "GestionBD API",
                 Version = "v1",
-                Description = "API para gestión de bases de datos con CQRS"
+                Description = "API para gestión de bases de datos con CQRS y autenticación Keycloak"
+            });
+
+            // Configuración de seguridad para Keycloak/JWT
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Ingrese el token JWT obtenido desde Keycloak. Ejemplo: 'Bearer {token}'"
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
             });
         });
 

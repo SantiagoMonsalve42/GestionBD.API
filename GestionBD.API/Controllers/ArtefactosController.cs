@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using GestionBD.Application.Artefactos.Commands;
 using GestionBD.Application.Artefactos.Queries;
 using GestionBD.Application.Contracts.Artefactos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GestionBD.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public sealed class ArtefactosController : ControllerBase
 {
     private readonly IMediator _mediator;

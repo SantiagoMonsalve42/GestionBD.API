@@ -1,12 +1,14 @@
 ﻿using GestionBD.Application.DTO;
 using GestionBD.Application.Statistics.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GestionBD.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class EstadisticasController : ControllerBase
 {
 
