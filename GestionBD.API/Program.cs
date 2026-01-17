@@ -1,25 +1,34 @@
+using GestionBD.API.Configuration;
+using GestionBD.API.Extensions;
+using GestionBD.Application;
+using GestionBD.Infraestructure;
+using GestionBD.Infraestructure.ExternalServices;
+
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+await builder.Services.AddExternalServicesAsync(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
+builder.Services.AddPresentation(builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Middleware
+app.UseExceptionHandling();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
+// Obtener el nombre de la política CORS desde configuración
+var corsSettings = builder.Configuration.GetSection(CorsSettings.SectionName).Get<CorsSettings>();
+if (corsSettings is not null)
+{
+    app.UseCors(corsSettings.PolicyName);
+}
 
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

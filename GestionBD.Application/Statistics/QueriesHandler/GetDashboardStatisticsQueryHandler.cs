@@ -1,0 +1,25 @@
+﻿using GestionBD.Application.Abstractions.Repositories.Query;
+using GestionBD.Application.DTO;
+using GestionBD.Application.Statistics.Queries;
+using MediatR;
+
+namespace GestionBD.Application.Statistics.QueriesHandler;
+
+public sealed class GetDashboardStatisticsQueryHandler
+        : IRequestHandler<GetDashboardStatisticsQuery, DashboardStatisticsDto?>
+{
+    private readonly IStatisticsRepository _statisticsRepository;
+
+    public GetDashboardStatisticsQueryHandler(IStatisticsRepository statisticsRepository)
+    {
+        _statisticsRepository = statisticsRepository
+            ?? throw new ArgumentNullException(nameof(statisticsRepository));
+    }
+
+    public async Task<DashboardStatisticsDto?> Handle(
+        GetDashboardStatisticsQuery request,
+        CancellationToken cancellationToken)
+    {
+        return await _statisticsRepository.GetDashboardStatisticsAsync();
+    }
+}

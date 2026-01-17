@@ -1,0 +1,213 @@
+using Azure.Core;
+using GestionBD.Application.Abstractions.Repositories.Query;
+using GestionBD.Application.Abstractions.Services;
+using GestionBD.Application.Contracts.Entregables;
+using GestionBD.Domain;
+using GestionBD.Domain.ValueObjects;
+using Microsoft.Data.SqlClient;
+
+namespace GestionBD.Application.Services
+{
+    public sealed class EntregableDeploymentService
+    {
+        private readonly IEntregableReadRepository _entregableReadRepository;
+        private readonly IArtefactoReadRepository _artefactoReadRepository;
+        private readonly IScriptExecutor _scriptExecutor;
+        private readonly IDacpacService _dacpacService;
+        private readonly IInstanciaReadRepository _instanciaReadRepository;
+        private readonly IUnitOfWork _unitOfWork;
+
+        public EntregableDeploymentService(
+            IEntregableReadRepository entregableReadRepository,
+            IArtefactoReadRepository artefactoReadRepository,
+            IScriptExecutor scriptExecutor,
+            IDacpacService dacpacService,
+            IInstanciaReadRepository instanciaReadRepository,
+            IUnitOfWork unitOfWork)
+        {
+            _entregableReadRepository = entregableReadRepository;
+            _artefactoReadRepository = artefactoReadRepository;
+            _scriptExecutor = scriptExecutor;
+            _dacpacService = dacpacService;
+            _instanciaReadRepository = instanciaReadRepository;
+            _unitOfWork = unitOfWork;
+        }
+
+        public async Task<IEnumerable<EntregablePreValidateResponse>> PreDeployAsync(
+            decimal idEntregable,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+                var entregable = await _entregableReadRepository.GetByIdAsync(idEntregable, cancellationToken);
+
+                if (entregable == null)
+                    throw new InvalidOperationException($"No se encontró el entregable con ID {idEntregable}");
+
+                if (string.IsNullOrWhiteSpace(entregable.TemporalBD))
+                    throw new InvalidOperationException($"El entregable {idEntregable} no tiene una base de datos temporal asignada");
+
+                // 2. Obtener los artefactos
+                var artefactos = await _artefactoReadRepository.GetByEntregableIdAsync(idEntregable, cancellationToken);
+
+                // 3. Convertir artefactos a entidades del dominio
+                var artefactosEntidades = artefactos.Select(a => new Domain.Entities.TblArtefacto
+                {
+                    IdArtefacto = a.IdArtefacto,
+                    IdEntregable = a.IdEntregable,
+                    OrdenEjecucion = a.OrdenEjecucion,
+                    Codificacion = a.Codificacion,
+                    NombreArtefacto = a.NombreArtefacto,
+                    RutaRelativa = a.RutaRelativa,
+                    EsReverso = a.EsReverso
+                }).ToList();
+
+                // 4. Extraer scripts del ZIP usando lógica de dominio
+                var scripts = ScriptDeployment.ExtractScriptsFromZip(entregable.RutaEntregable, artefactosEntidades);
+
+                // 5. Ejecutar cada script
+                var results = new List<EntregablePreValidateResponse>();
+
+                foreach (var script in scripts)
+                {
+                    var result = await ExecuteScriptAsync(script,
+                                                          entregable.TemporalBD,
+                                                          null,
+                                                          null,
+                                                          null,
+                                                          cancellationToken);
+                    results.Add(result);
+                }
+                var someInvalid = results.Exists(x => !x.IsValid);
+                if (someInvalid && entregable.RutaDACPAC != null)
+                {
+                    await _dacpacService.DeployDacpacToTemporaryDatabaseAsync(
+                     dacpacPath: entregable.RutaDACPAC,
+                     bdName: entregable.TemporalBD,
+                     cancellationToken: cancellationToken
+                    );
+                }
+                await _unitOfWork.Entregables.UpdateEstado(idEntregable, Domain.Enum.EstadoEntregaEnum.PreDespliegue, cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                return results;
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                throw;
+            }
+            
+        }
+        public async Task<IEnumerable<EntregablePreValidateResponse>> DeployAsync(
+            decimal idEntregable,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+                var entregable = await _entregableReadRepository.GetByIdAsync(idEntregable, cancellationToken);
+
+                if (entregable == null)
+                    throw new InvalidOperationException($"No se encontró el entregable con ID {idEntregable}");
+                // 1.1 Obtener detalles de conexión
+                var datosInstancia = await _instanciaReadRepository.GetConnectionDetailsByEntregableIdAsync(entregable.IdEntregable, cancellationToken);
+
+                if (datosInstancia == null)
+                    throw new InvalidOperationException($"No se encontró conexion parametrizada con ID {idEntregable}");
+
+                // 2. Obtener los artefactos
+                var artefactos = await _artefactoReadRepository.GetByEntregableIdAsync(idEntregable, cancellationToken);
+
+                // 3. Convertir artefactos a entidades del dominio
+                var artefactosEntidades = artefactos.Select(a => new Domain.Entities.TblArtefacto
+                {
+                    IdArtefacto = a.IdArtefacto,
+                    IdEntregable = a.IdEntregable,
+                    OrdenEjecucion = a.OrdenEjecucion,
+                    Codificacion = a.Codificacion,
+                    NombreArtefacto = a.NombreArtefacto,
+                    RutaRelativa = a.RutaRelativa,
+                    EsReverso = a.EsReverso
+                }).ToList();
+
+                // 4. Extraer scripts del ZIP usando lógica de dominio
+                var scripts = ScriptDeployment.ExtractScriptsFromZip(entregable.RutaEntregable, artefactosEntidades);
+
+                // 5. Ejecutar cada script
+                var results = new List<EntregablePreValidateResponse>();
+
+                foreach (var script in scripts)
+                {
+                    var result = await ExecuteScriptAsync(script,
+                                                          datosInstancia.NombreBD,
+                                                          $"{datosInstancia.Instancia},{datosInstancia.Puerto}",
+                                                          datosInstancia.Usuario,
+                                                          datosInstancia.Password,
+                                                          cancellationToken);
+                    results.Add(result);
+                }
+                await _unitOfWork.Entregables.UpdateEstado(idEntregable, Domain.Enum.EstadoEntregaEnum.Despliegue, cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                return results;
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                throw;
+            }
+            
+        }
+        private async Task<EntregablePreValidateResponse> ExecuteScriptAsync(
+            ScriptDeployment script,
+            string databaseName, 
+            string? serverName = null,
+            string? username = null,
+            string? password = null,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var batches = script.SplitIntoBatches();
+
+                foreach (var batch in batches)
+                {
+                    await _scriptExecutor.ExecuteAsync(databaseName, 
+                                                        batch,
+                                                        serverName,
+                                                        username,
+                                                        password,
+                                                        cancellationToken);
+                }
+
+                return new EntregablePreValidateResponse(
+                    IsValid: true,
+                    Script: script.ScriptName,
+                    Status: "Success",
+                    Message: "Script ejecutado correctamente",
+                    AdditionalInfo: $"Orden de ejecución: {script.ExecutionOrder}"
+                );
+            }
+            catch (SqlException sqlEx)
+            {
+                return new EntregablePreValidateResponse(
+                    IsValid: false,
+                    Script: script.ScriptName,
+                    Status: "SqlError",
+                    Message: $"Error SQL: {sqlEx.Message}",
+                    AdditionalInfo: $"Número de error: {sqlEx.Number}, Línea: {sqlEx.LineNumber}"
+                );
+            }
+            catch (Exception ex)
+            {
+                return new EntregablePreValidateResponse(
+                    IsValid: false,
+                    Script: script.ScriptName,
+                    Status: "Error",
+                    Message: ex.Message,
+                    AdditionalInfo: ex.StackTrace
+                );
+            }
+        }
+    }
+}
