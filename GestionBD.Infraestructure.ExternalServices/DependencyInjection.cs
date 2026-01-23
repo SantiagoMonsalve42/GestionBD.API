@@ -1,4 +1,6 @@
 using GestionBD.Application.Abstractions.Config;
+using GestionBD.Domain.Services;
+using GestionBD.Infraestructure.ExternalServices.OpenAI;
 using GestionBD.Infraestructure.ExternalServices.Vault;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,6 +39,9 @@ public static class DependencyInjection
         services.AddSingleton(Microsoft.Extensions.Options.Options.Create(connectionStringsSettings));
         services.AddSingleton(Microsoft.Extensions.Options.Options.Create(openIASettings));
         services.AddSingleton(Microsoft.Extensions.Options.Options.Create(keycloakSettings));
+
+        // 5. Registrar HttpClient y servicio de OpenAI
+        services.AddHttpClient<ISqlValidationService, OpenAISqlValidationService>();
 
         return services;
     }

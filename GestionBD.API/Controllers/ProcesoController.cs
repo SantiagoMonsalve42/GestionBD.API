@@ -1,4 +1,5 @@
-﻿using GestionBD.Application.Entregables.Commands;
+﻿using GestionBD.Application.Artefactos.Commands;
+using GestionBD.Application.Entregables.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ namespace GestionBD.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[AllowAnonymous]
 public sealed class ProcesoController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -24,7 +25,6 @@ public sealed class ProcesoController : ControllerBase
         var isValid = await _mediator.Send(new EntregableEfimeroCommand(idEntregable));
         return Ok(new { isValid });
     }
-
     [HttpPost("second-step/{idEntregable:decimal}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> PreDeployEntregableFile(decimal idEntregable)
@@ -32,7 +32,15 @@ public sealed class ProcesoController : ControllerBase
         var isValid = await _mediator.Send(new DesplegarEntregableEfimeroCommand(idEntregable));
         return Ok(isValid);
     }
+
     [HttpPost("third-step/{idEntregable:decimal}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ValidateArtefactos(decimal idEntregable)
+    {
+        var isValid = await _mediator.Send(new ValidateArtefactoCommand(idEntregable));
+        return Ok(isValid);
+    }
+    [HttpPost("fourth-step/{idEntregable:decimal}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> DeployEntregableFile(decimal idEntregable)
     {
@@ -40,7 +48,7 @@ public sealed class ProcesoController : ControllerBase
         return Ok(new { isValid });
     }
 
-    [HttpPost("fourth-step/{idEntregable:decimal}")]
+    [HttpPost("fifth-step/{idEntregable:decimal}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> SentToRevision(decimal idEntregable)
     {
@@ -48,7 +56,7 @@ public sealed class ProcesoController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("fifth-step/{idEntregable:decimal}")]
+    [HttpPost("sixth-step/{idEntregable:decimal}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> SentToCerrado(decimal idEntregable)
     {
