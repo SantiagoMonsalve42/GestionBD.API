@@ -52,6 +52,7 @@ public static class DependencyInjection
 
         // Script Executor
         services.AddScoped<IScriptExecutor, SqlServerScriptExecutor>();
+        services.AddScoped<IDeployLog, DeployLog>();
 
         return services;
     }

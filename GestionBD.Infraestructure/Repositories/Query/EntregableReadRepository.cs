@@ -26,7 +26,8 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
             	ent.rutaDACPAC as RutaDACPAC,
             	ent.temporalBD as TemporalBD,
                 est.descripcionEstado as EstadoEntrega,
-            	est.idEstado as EstadoEntregaId
+            	est.idEstado as EstadoEntregaId,
+                ent.rutaResultado as RutaResultado
             FROM dbo.tbl_Entregables ent
             JOIN dbo.tbl_EstadoEntrega est
             on ent.idEstado = est.idEstado
@@ -48,7 +49,8 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
                	ent.rutaDACPAC as RutaDACPAC,
                	ent.temporalBD as TemporalBD,
             	est.descripcionEstado as EstadoEntrega,
-            	est.idEstado as EstadoEntregaId
+            	est.idEstado as EstadoEntregaId,
+                ent.rutaResultado as RutaResultado
             FROM dbo.tbl_Entregables ent
             JOIN dbo.tbl_EstadoEntrega est
             on ent.idEstado = est.idEstado
@@ -71,7 +73,8 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
             	ent.rutaDACPAC as RutaDACPAC,
             	ent.temporalBD as TemporalBD,
                 est.descripcionEstado as EstadoEntrega,
-            	est.idEstado as EstadoEntregaId
+            	est.idEstado as EstadoEntregaId,
+                ent.rutaResultado as RutaResultado
             FROM dbo.tbl_Entregables ent
             JOIN dbo.tbl_EstadoEntrega est
             on ent.idEstado = est.idEstado

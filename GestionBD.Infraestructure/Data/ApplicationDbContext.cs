@@ -131,6 +131,11 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnType("int")
                 .HasColumnName("idEstado");
 
+            entity.Property(e => e.RutaResultado)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("rutaResultado");
+
             entity.HasOne(d => d.IdEjecucionNavigation).WithMany(p => p.TblEntregables)
                 .HasForeignKey(d => d.IdEjecucion)
                 .OnDelete(DeleteBehavior.ClientSetNull)

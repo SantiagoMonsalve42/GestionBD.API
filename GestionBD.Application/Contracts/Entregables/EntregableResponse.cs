@@ -19,5 +19,6 @@ public sealed record EntregableResponseEstado(
     string? RutaDACPAC,
     string? TemporalBD,
     string EstadoEntrega,
-    int EstadoEntregaId
+    int EstadoEntregaId,
+    string? RutaResultado
 );

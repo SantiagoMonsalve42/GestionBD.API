@@ -37,7 +37,7 @@ public sealed class ProcesoController : ControllerBase
     public async Task<IActionResult> DeployEntregableFile(decimal idEntregable)
     {
         var isValid = await _mediator.Send(new DesplegarEntregableCommand(idEntregable));
-        return Ok(isValid);
+        return Ok(new { isValid });
     }
 
     [HttpPost("fourth-step/{idEntregable:decimal}")]

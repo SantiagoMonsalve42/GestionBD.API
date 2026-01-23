@@ -28,4 +28,13 @@ public sealed class EntregableRepository : Repository<TblEntregable>, IEntregabl
         await _context.SaveChangesAsync(cancellationToken);
         return true;
     }
+
+    public async Task<bool> UpdateRutaResultado(decimal idEntregable, string rutaResultado, CancellationToken cancellationToken = default)
+    {
+        var result = await _context.TblEntregables.Where(x => x.IdEntregable == idEntregable)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(b => b.RutaResultado, rutaResultado)
+                , cancellationToken);
+        return result > 0;
+    }
 }

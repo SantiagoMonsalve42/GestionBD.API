@@ -7,4 +7,5 @@ public interface IEntregableRepository : IRepository<TblEntregable>
 {
     Task<bool> UpdateDACPAC(decimal idEntregable, string rutaDacpac,string temporalBD, CancellationToken cancellationToken = default);
     Task<bool> UpdateEstado(decimal idEntregable, EstadoEntregaEnum estadoEntregaEnum, CancellationToken cancellationToken = default);
+    Task<bool> UpdateRutaResultado(decimal idEntregable, string rutaResultado, CancellationToken cancellationToken = default);
 }
