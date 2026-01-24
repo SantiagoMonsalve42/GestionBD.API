@@ -37,6 +37,7 @@ public sealed class OpenAISqlValidationService : ISqlValidationService
     }
 
     public async Task<SqlValidation> ValidateScriptAsync(
+        bool isSecuencial,
         string sqlScript,
         CancellationToken cancellationToken = default)
     {
@@ -45,13 +46,13 @@ public sealed class OpenAISqlValidationService : ISqlValidationService
 
         try
         {
-            var request = BuildValidationRequest(sqlScript);
+            var request = BuildValidationRequest(isSecuencial,sqlScript);
             
             _logger.LogInformation(
                 "Enviando script SQL a OpenAI para validación. Longitud: {Length} caracteres", 
                 sqlScript.Length);
 
-            var response = await _httpClient.PostAsJsonAsync(
+         var response = await _httpClient.PostAsJsonAsync(
                 "/v1/responses", 
                 request, 
                 JsonOptions, 
@@ -104,14 +105,14 @@ public sealed class OpenAISqlValidationService : ISqlValidationService
         _httpClient.Timeout = TimeSpan.FromSeconds(60);
     }
 
-    private OpenAIValidationRequest BuildValidationRequest(string sqlScript)
+    private OpenAIValidationRequest BuildValidationRequest(bool isSecuencial,string sqlScript)
     {
         var model = _settings.Model;
         var maxTokens = int.TryParse(_settings.MaxTokens, out var tokens) ? tokens : 600;
 
         var systemPrompt = "Eres un motor automático de validación SQL. No expliques razonamientos internos. Responde únicamente un objeto JSON válido.";
         
-        var userPrompt = $@"CASO_USO: VALIDACION_SQL
+        var userPrompt = (!isSecuencial)? $@"CASO_USO: VALIDACION_SQL
 
                             REGLAS:
                             - No usar DROP sin IF EXISTS
@@ -120,11 +121,30 @@ public sealed class OpenAISqlValidationService : ISqlValidationService
                             - Transacciones deben usar BEGIN / COMMIT
                             - No usar GO dentro de SP o funciones
                             - Sugerir mejoras solo si son críticas
+                            - Validar idempotencia
 
                             SCRIPT_SQL:
                             {sqlScript}
 
-                            RESPONDE EXCLUSIVAMENTE CON ESTE OBJETO JSON:
+                            RESPONDE EXCLUSIVAMENTE CON ESTE OBJETO JSON, code y message siempre en español:
+                            {{
+                              ""isValid"": boolean,
+                              ""errors"": [{{ ""code"": string, ""message"": string }}],
+                              ""warnings"": [{{ ""code"": string, ""message"": string }}],
+                              ""suggestions"": [{{ ""code"": string, ""message"": string }}]
+                            }}"
+                            : 
+                            $@"CASO_USO: VALIDAR QUE EN CASO DE EJECUTAR LOS SCRIPT EN EL ORDEN ESTABLECIDO, TODO FUNCIONE
+
+                            REGLAS:
+                            - Validar que no haya conflictos entre scripts
+                            - Validar que no haya dependencias en el orden establecido
+                            - Validar idempotencia
+
+                            SCRIPT_SQL:
+                            {sqlScript}
+
+                            RESPONDE EXCLUSIVAMENTE CON ESTE OBJETO JSON, code y message siempre en español:
                             {{
                               ""isValid"": boolean,
                               ""errors"": [{{ ""code"": string, ""message"": string }}],

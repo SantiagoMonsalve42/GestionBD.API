@@ -1,25 +1,29 @@
 ﻿using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Artefactos.Commands;
 using GestionBD.Application.Contracts.Artefactos;
+using GestionBD.Domain;
 using GestionBD.Domain.Services;
 using GestionBD.Domain.ValueObjects;
 using MediatR;
 using System.Collections.Concurrent;
+using System.Text;
 
 namespace GestionBD.Application.Artefactos.CommandsHandlers;
 
 public sealed class ValidateArtefactoCommandHandler 
     : IRequestHandler<ValidateArtefactoCommand, IEnumerable<ValidateArtefactoResponse>>
 {
-    private readonly IEntregableReadRepository _entregableReadRepository;
+    private readonly IEntregableReadRepository _entregableReadRepository; 
     private readonly IArtefactoReadRepository _artefactoReadRepository;
     private readonly ISqlValidationService _sqlValidationService;
+    private readonly IUnitOfWork _unitOfWork;
     private const int MaxConcurrentValidations = 5; // Limitar a 5 validaciones simultáneas
 
     public ValidateArtefactoCommandHandler(
         IEntregableReadRepository entregableReadRepository, 
         IArtefactoReadRepository artefactoReadRepository,
-        ISqlValidationService sqlValidationService)
+        ISqlValidationService sqlValidationService,
+        IUnitOfWork unitOfWork)
     {
         _entregableReadRepository = entregableReadRepository 
             ?? throw new ArgumentNullException(nameof(entregableReadRepository));
@@ -27,6 +31,8 @@ public sealed class ValidateArtefactoCommandHandler
             ?? throw new ArgumentNullException(nameof(artefactoReadRepository));
         _sqlValidationService = sqlValidationService 
             ?? throw new ArgumentNullException(nameof(sqlValidationService));
+        _unitOfWork = unitOfWork 
+            ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public async Task<IEnumerable<ValidateArtefactoResponse>> Handle(
@@ -61,10 +67,31 @@ public sealed class ValidateArtefactoCommandHandler
             artefactosEntidades);
 
         var results = await ValidateScriptsWithThrottlingAsync(scripts, cancellationToken);
-
+        var secuencialResult = await ValidateSecuencialExecution(scripts, cancellationToken);
+        if (secuencialResult != null)
+            results=results.Append(secuencialResult);
+        await _unitOfWork.Entregables.UpdateEstado(request.idEntregable,Domain.Enum.EstadoEntregaEnum.Analisis, cancellationToken);
+        await _unitOfWork.CommitTransactionAsync();
         return results;
     }
-
+    private async Task<ValidateArtefactoResponse> ValidateSecuencialExecution(
+        IEnumerable<ScriptDeployment> scripts,
+        CancellationToken cancellationToken)
+    {
+        // Validate Order
+        StringBuilder scriptSecuencialContent = new StringBuilder();
+        int i = 1;
+        foreach (var script in scripts)
+        {
+            scriptSecuencialContent.Append($"{i}. {script.ScriptContent} ");
+            i++;
+        }
+        var validation = await _sqlValidationService.ValidateScriptAsync(
+                    true,
+                    scriptSecuencialContent.ToString(),
+                    cancellationToken);
+        return new ValidateArtefactoResponse(new string("Secuencial"), validation);
+    }
     private async Task<IEnumerable<ValidateArtefactoResponse>> ValidateScriptsWithThrottlingAsync(
         IEnumerable<ScriptDeployment> scripts,
         CancellationToken cancellationToken)
@@ -78,6 +105,7 @@ public sealed class ValidateArtefactoCommandHandler
             try
             {
                 var validation = await _sqlValidationService.ValidateScriptAsync(
+                    false,
                     script.ScriptContent, 
                     cancellationToken);
                 
