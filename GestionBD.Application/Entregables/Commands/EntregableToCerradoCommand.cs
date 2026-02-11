@@ -1,6 +1,8 @@
 ﻿using MediatR;
 
-namespace GestionBD.Application.Entregables.Commands;
+namespace GestionBD.Application.Entregables.Commands
+{
+    public sealed record EntregableToCerradoCommand(decimal idEntregable) : IRequest<Unit>;
+}
 
 
-public sealed record EntregableToCerradoCommand(decimal idEntregable) : IRequest<Unit>;

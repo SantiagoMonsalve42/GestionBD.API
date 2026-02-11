@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionBD.Infraestructure.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionBD.Application", "GestionBD.Application\GestionBD.Application.csproj", "{799D8A22-E9C1-48B9-A34C-CF7FBC21723A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionBD.Utils", "GestionBD.Utils\GestionBD.Utils.csproj", "{3E227F53-5BB4-4C61-81BA-888498A02E4E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,10 @@ Global
 		{799D8A22-E9C1-48B9-A34C-CF7FBC21723A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{799D8A22-E9C1-48B9-A34C-CF7FBC21723A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{799D8A22-E9C1-48B9-A34C-CF7FBC21723A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E227F53-5BB4-4C61-81BA-888498A02E4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E227F53-5BB4-4C61-81BA-888498A02E4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E227F53-5BB4-4C61-81BA-888498A02E4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E227F53-5BB4-4C61-81BA-888498A02E4E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -45,8 +45,8 @@ public sealed class ProcesoController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GenerarRollback(decimal idEntregable)
     {
-        //var isValid = await _mediator.Send(new DesplegarEntregableCommand(idEntregable));
-        return Ok("TODO");
+        var rollbackResult = await _mediator.Send(new GenerateRollbackCommand(idEntregable));
+        return Ok(new { rollbackResult });
     }
 
     [HttpPost("fifth-step/{idEntregable:decimal}")]
