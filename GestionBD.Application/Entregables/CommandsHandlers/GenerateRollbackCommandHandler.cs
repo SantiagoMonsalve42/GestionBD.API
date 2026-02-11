@@ -2,9 +2,11 @@
 using GestionBD.Application.Abstractions.Services;
 using GestionBD.Application.Contracts.Instancias;
 using GestionBD.Application.Entregables.Commands;
+using GestionBD.Domain.Services;
 using GestionBD.Domain.ValueObjects;
 using MediatR;
 using System.Collections.Generic;
+using System.Text;
 
 namespace GestionBD.Application.Entregables.CommandsHandlers
 {
@@ -15,16 +17,19 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
         private readonly IArtefactoReadRepository _artefactoReadRepository;
         private readonly IDatabaseService _databaseService;
         private readonly IInstanciaReadRepository _instanciaReadRepository;
+        private readonly IRollbackGenerationService _rollbackScriptGeneratorService;
         public GenerateRollbackCommandHandler(IScriptRegexService scriptRegexService,
                                               IEntregableReadRepository entregableReadRepository,
                                               IArtefactoReadRepository artefactoReadRepository,
                                               IDatabaseService databaseService,
-                                              IInstanciaReadRepository instanciaReadRepository)
+                                              IInstanciaReadRepository instanciaReadRepository,
+                                              IRollbackGenerationService rollbackScriptGeneratorService)
         {
             _scriptRegexService = scriptRegexService;
             _entregableReadRepository = entregableReadRepository;
             _artefactoReadRepository = artefactoReadRepository;
             _databaseService = databaseService;
+            _rollbackScriptGeneratorService = rollbackScriptGeneratorService;
             _instanciaReadRepository = instanciaReadRepository;
         }
         public async Task<string> Handle(GenerateRollbackCommand request, CancellationToken cancellationToken)
@@ -60,33 +65,68 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
             var scripts = ScriptDeployment.ExtractScriptsFromZip(
                 entregable.RutaEntregable,
                 artefactosEntidades);
-            List<string> relatedObject = getRelatedObjects(scripts);
-            List<string> objectDefinitions = await getObjectDefinitions(relatedObject, datosInstancia);
+
+            var rollbackResponses = await getRollbackResponses(scripts,datosInstancia);
+            
             return null;
         }
-        private List<string> getRelatedObjects(IEnumerable<ScriptDeployment> scripts)
+        private async Task<List<RollbackGeneration>> getRollbackResponses(IEnumerable<ScriptDeployment> scripts, InstanciaConnectResponse instanciaConnectResponse)
         {
-            var relatedObjects = new List<string>();
-            foreach (var script in scripts)
-            {
-                var objectsInScript = _scriptRegexService.getRelatedObjects(script.ScriptContent);
-                relatedObjects.AddRange(objectsInScript);
-            }
-            return relatedObjects.Distinct().ToList();
+            List<RollbackGeneration> tasksCompleted = new List<RollbackGeneration>();
+            var tasksPending = scripts.Select(async script =>
+                tasksCompleted.Add(await generateRollbackServiceScript(script.ScriptContent, await getRelatedObjects(script, instanciaConnectResponse)))
+                );
+            await Task.WhenAll(tasksPending);
+            return tasksCompleted;
         }
-        private async Task<List<string>> getObjectDefinitions(List<string> scripts, InstanciaConnectResponse instanciaConnectResponse)
+        private async Task<string> getRelatedObjects(ScriptDeployment script, InstanciaConnectResponse instanciaConnectResponse)
         {
-            var objectDefinitions = new List<string>();
-            foreach (var script in scripts)
+            var objectsInScript = _scriptRegexService.getRelatedObjects(script.ScriptContent);
+            
+            if (!objectsInScript.Any())
+                return string.Empty;
+            
+            using var semaphore = new SemaphoreSlim(Environment.ProcessorCount, Environment.ProcessorCount);
+            
+            var tasks = objectsInScript.Select(async objectScript =>
             {
-                string definition = await _databaseService.getObjectDefinition($"{instanciaConnectResponse.Instancia},{instanciaConnectResponse.Puerto}",
-                                                    instanciaConnectResponse.NombreBD,
-                                                    instanciaConnectResponse.Usuario,
-                                                    instanciaConnectResponse.Password,
-                                                    script);
-                objectDefinitions.Add(definition);
-            }
-            return objectDefinitions.Where(x => !string.IsNullOrEmpty(x)).ToList();
+                await semaphore.WaitAsync();
+                try
+                {
+                    return await _databaseService.getObjectDefinition(
+                        $"{instanciaConnectResponse.Instancia},{instanciaConnectResponse.Puerto}",
+                        instanciaConnectResponse.NombreBD,
+                        instanciaConnectResponse.Usuario,
+                        instanciaConnectResponse.Password, 
+                        objectScript);
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            });
+            
+            var relatedObjects = await Task.WhenAll(tasks);
+            
+            return scriptListToContext(relatedObjects.Where(x => !string.IsNullOrEmpty(x)).ToList());
         }
+        private string scriptListToContext(List<string> objectDefinitions)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            int index = 0;
+            foreach (var definition in objectDefinitions)
+            {
+                stringBuilder.AppendLine($"{index}. {definition} | ");
+                index++;
+            }
+            return stringBuilder.ToString();    
+        }
+        private async Task<RollbackGeneration> generateRollbackServiceScript(string newObjectsDefinitions,
+                                            string currentObjectsDefinitions)
+        {
+            return await _rollbackScriptGeneratorService
+                            .GenerateRollbackAsync(newObjectsDefinitions, currentObjectsDefinitions);
+        }
+        
     }
 }

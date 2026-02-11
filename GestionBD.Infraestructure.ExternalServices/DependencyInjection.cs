@@ -42,6 +42,7 @@ public static class DependencyInjection
 
         // 5. Registrar HttpClient y servicio de OpenAI
         services.AddHttpClient<ISqlValidationService, OpenAISqlValidationService>();
+        services.AddHttpClient<IRollbackGenerationService, OpenAIRollbackGenerationService>();
 
         return services;
     }
