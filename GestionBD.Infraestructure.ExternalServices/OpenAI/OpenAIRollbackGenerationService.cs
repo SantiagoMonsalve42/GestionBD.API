@@ -85,7 +85,7 @@ public sealed class OpenAIRollbackGenerationService : IRollbackGenerationService
             throw new InvalidOperationException("Error al procesar la respuesta de rollback de OpenAI", ex);
         }
     }
-
+    #region Private methods
     private void ConfigureHttpClient()
     {
         if (string.IsNullOrWhiteSpace(_settings.BaseURL))
@@ -229,7 +229,7 @@ public sealed class OpenAIRollbackGenerationService : IRollbackGenerationService
         );
     }
 
-    // DTOs internos solo para deserialización
+    
     private sealed record RollbackDto(
         MetadataDto Metadata,
         List<RollbackScriptDto>? RollbackScripts,
@@ -251,4 +251,5 @@ public sealed class OpenAIRollbackGenerationService : IRollbackGenerationService
         string Script,
         List<string>? DependsOn
     );
+    #endregion
 }

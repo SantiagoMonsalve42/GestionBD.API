@@ -10,7 +10,7 @@ using System.Text;
 
 namespace GestionBD.Application.Entregables.CommandsHandlers
 {
-    public class GenerateRollbackCommandHandler : IRequestHandler<GenerateRollbackCommand, string>
+    public class GenerateRollbackCommandHandler : IRequestHandler<GenerateRollbackCommand, string?>
     {
         private readonly IScriptRegexService _scriptRegexService;
         private readonly IEntregableReadRepository _entregableReadRepository;
@@ -18,12 +18,14 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
         private readonly IDatabaseService _databaseService;
         private readonly IInstanciaReadRepository _instanciaReadRepository;
         private readonly IRollbackGenerationService _rollbackScriptGeneratorService;
+        private readonly IRollbackService _rollbackService;
         public GenerateRollbackCommandHandler(IScriptRegexService scriptRegexService,
                                               IEntregableReadRepository entregableReadRepository,
                                               IArtefactoReadRepository artefactoReadRepository,
                                               IDatabaseService databaseService,
                                               IInstanciaReadRepository instanciaReadRepository,
-                                              IRollbackGenerationService rollbackScriptGeneratorService)
+                                              IRollbackGenerationService rollbackScriptGeneratorService,
+                                              IRollbackService rollbackService)
         {
             _scriptRegexService = scriptRegexService;
             _entregableReadRepository = entregableReadRepository;
@@ -31,8 +33,9 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
             _databaseService = databaseService;
             _rollbackScriptGeneratorService = rollbackScriptGeneratorService;
             _instanciaReadRepository = instanciaReadRepository;
+            _rollbackService = rollbackService;
         }
-        public async Task<string> Handle(GenerateRollbackCommand request, CancellationToken cancellationToken)
+        public async Task<string?> Handle(GenerateRollbackCommand request, CancellationToken cancellationToken)
         {
             var entregable = await _entregableReadRepository.GetByIdAsync(
             request.idEntregable,
@@ -67,8 +70,8 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
                 artefactosEntidades);
 
             var rollbackResponses = await getRollbackResponses(scripts,datosInstancia);
-            
-            return null;
+            var zipPath = await _rollbackService.GenerateRollbackScriptAsync(rollbackResponses,entregable.RutaEntregable,cancellationToken);
+            return string.IsNullOrEmpty(zipPath) ? "No se pudo generar el archivo" : $"Archivo de rollback generado en la ruta: {zipPath}";
         }
         private async Task<List<RollbackGeneration>> getRollbackResponses(IEnumerable<ScriptDeployment> scripts, InstanciaConnectResponse instanciaConnectResponse)
         {

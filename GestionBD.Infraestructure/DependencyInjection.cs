@@ -55,6 +55,7 @@ public static class DependencyInjection
         services.AddScoped<IDeployLog, DeployLog>();
         services.AddScoped<IScriptRegexService, ScriptRegexService>();
         services.AddScoped<IDatabaseService, DatabaseService>();
+        services.AddScoped<IRollbackService, RollbackService>();
 
         return services;
     }
