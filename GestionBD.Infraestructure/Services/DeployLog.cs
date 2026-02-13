@@ -61,8 +61,8 @@ public sealed class DeployLog : IDeployLog
         sb.AppendLine("─────────────────────────────────────────────────────────────────");
         sb.AppendLine("                         RESUMEN EJECUTIVO                        ");
         sb.AppendLine("─────────────────────────────────────────────────────────────────");
-        sb.AppendLine($"✓ Scripts exitosos:    {exitosos} ({(respuestasList.Count > 0 ? (exitosos * 100.0 / respuestasList.Count):0):F2}%)");
-        sb.AppendLine($"✗ Scripts fallidos:    {fallidos} ({(respuestasList.Count > 0 ? (fallidos * 100.0 / respuestasList.Count):0):F2}%)");
+        sb.AppendLine($"Scripts exitosos:    {exitosos} ({(respuestasList.Count > 0 ? (exitosos * 100.0 / respuestasList.Count):0):F2}%)");
+        sb.AppendLine($"Scripts fallidos:    {fallidos} ({(respuestasList.Count > 0 ? (fallidos * 100.0 / respuestasList.Count):0):F2}%)");
         sb.AppendLine();
 
         // Detalle de cada script
@@ -74,10 +74,9 @@ public sealed class DeployLog : IDeployLog
         int contador = 1;
         foreach (var respuesta in respuestasList)
         {
-            var icono = respuesta.IsValid ? "✓" : "✗";
             var estado = respuesta.IsValid ? "ÉXITO" : "FALLIDO";
 
-            sb.AppendLine($"[{contador}] {icono} SCRIPT: {respuesta.Script}");
+            sb.AppendLine($"[{contador}] SCRIPT: {respuesta.Script}");
             sb.AppendLine(new string('─', 70));
             sb.AppendLine($"Estado:        {estado}");
             sb.AppendLine($"Status:        {respuesta.Status}");
