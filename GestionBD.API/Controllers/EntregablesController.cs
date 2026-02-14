@@ -51,6 +51,17 @@ public sealed class EntregablesController : ControllerBase
         return Ok(entregables);
     }
     /// <summary>
+    /// Obtiene todos los entregables para revisión
+    /// </summary>
+    [HttpGet("revision")]
+    [Authorize(Policy = "AdminOnly")]
+    [ProducesResponseType(typeof(IEnumerable<EntregableRevisionResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> getAllRevision()
+    {
+        var entregables = await _mediator.Send(new GetEntregablesRevisionQuery());
+        return Ok(entregables);
+    }
+    /// <summary>
     /// Obtiene todos los entregables por IdEjecucion
     /// </summary>
     [HttpGet("Ejecucion/{idEjecucion:decimal}")]

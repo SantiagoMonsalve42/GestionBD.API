@@ -12,6 +12,14 @@ public sealed class EntregableRepository : Repository<TblEntregable>, IEntregabl
     {
     }
 
+    public async Task<bool> removeDatabase(decimal idEntregable, CancellationToken cancellationToken = default)
+    {
+        var result = await _context.TblEntregables.Where(x => x.IdEntregable == idEntregable)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(b => b.TemporalBD, string.Empty), cancellationToken);
+        return result > 0;
+    }
+
     public async Task<bool> UpdateDACPAC(decimal idEntregable, string rutaDacpac,string temporalBD, CancellationToken cancellationToken = default)
     {
         var result = await _context.TblEntregables.Where(x=> x.IdEntregable == idEntregable)
@@ -24,6 +32,8 @@ public sealed class EntregableRepository : Repository<TblEntregable>, IEntregabl
     public async Task<bool> UpdateEstado(decimal idEntregable, EstadoEntregaEnum estadoEntregaEnum, CancellationToken cancellationToken = default)
     {
         var entregable = await _context.TblEntregables.FirstOrDefaultAsync(x => x.IdEntregable == idEntregable);
+        if (entregable == null)
+            return false;
         entregable.IdEstado = (decimal)estadoEntregaEnum;
         await _context.SaveChangesAsync(cancellationToken);
         return true;
@@ -34,6 +44,14 @@ public sealed class EntregableRepository : Repository<TblEntregable>, IEntregabl
         var result = await _context.TblEntregables.Where(x => x.IdEntregable == idEntregable)
             .ExecuteUpdateAsync(setters => setters
                 .SetProperty(b => b.RutaResultado, rutaResultado)
+                , cancellationToken);
+        return result > 0;
+    }
+    public async Task<bool> UpdateRutaRollback(decimal idEntregable, string rutaRollback, CancellationToken cancellationToken = default)
+    {
+        var result = await _context.TblEntregables.Where(x => x.IdEntregable == idEntregable)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(b => b.RutaRollbackGenerado, rutaRollback)
                 , cancellationToken);
         return result > 0;
     }

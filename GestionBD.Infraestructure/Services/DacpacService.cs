@@ -146,7 +146,7 @@ public sealed class DacpacService : IDacpacService
     }
 
     public async Task DropTemporaryDatabaseAsync(string databaseName,
-                                                  CancellationToken cancellationToken = default)
+                                              CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(serverName))
             throw new ArgumentException("El nombre del servidor no puede estar vacío", nameof(serverName));
@@ -158,25 +158,63 @@ public sealed class DacpacService : IDacpacService
             throw new InvalidOperationException("Solo se pueden eliminar bases de datos temporales (TempDB_*)");
 
         var connectionString = SqlConnectionStringHelper.BuildConnectionString(
-            serverName, 
-            "master", 
-            username, 
+            serverName,
+            "master",
+            username,
             password);
 
         await using var connection = new SqlConnection(connectionString);
         await connection.OpenAsync(cancellationToken);
 
-        var killConnectionsCommand = connection.CreateCommand();
-        killConnectionsCommand.CommandText = $@"
+        // 1. Verificar si la base de datos existe
+        var checkExistsCommand = connection.CreateCommand();
+        checkExistsCommand.CommandText = """
+        SELECT COUNT(1) 
+        FROM sys.databases 
+        WHERE name = @DatabaseName
+        """;
+        checkExistsCommand.Parameters.AddWithValue("@DatabaseName", databaseName);
+
+        var exists = (int)await checkExistsCommand.ExecuteScalarAsync(cancellationToken) > 0;
+
+        if (!exists)
+        {
+            Console.WriteLine($"La base de datos '{databaseName}' no existe.");
+            return;
+        }
+
+        try
+        {
+            // 2. Script SQL dinámico para cerrar conexiones
+            var killConnectionsCommand = connection.CreateCommand();
+            killConnectionsCommand.CommandText = $"""
+            IF EXISTS (SELECT 1 FROM sys.databases WHERE name = @DatabaseName)
+            BEGIN
                 ALTER DATABASE [{databaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-            ";
-        await killConnectionsCommand.ExecuteNonQueryAsync(cancellationToken);
+            END
+            """;
+            killConnectionsCommand.Parameters.AddWithValue("@DatabaseName", databaseName);
+            await killConnectionsCommand.ExecuteNonQueryAsync(cancellationToken);
 
-        var dropCommand = connection.CreateCommand();
-        dropCommand.CommandText = $"DROP DATABASE [{databaseName}];";
-        await dropCommand.ExecuteNonQueryAsync(cancellationToken);
+            // 3. Script SQL dinámico para eliminar la base de datos
+            var dropCommand = connection.CreateCommand();
+            dropCommand.CommandText = $"""
+            IF EXISTS (SELECT 1 FROM sys.databases WHERE name = @DatabaseName)
+            BEGIN
+                DROP DATABASE [{databaseName}];
+            END
+            """;
+            dropCommand.Parameters.AddWithValue("@DatabaseName", databaseName);
+            await dropCommand.ExecuteNonQueryAsync(cancellationToken);
+
+            Console.WriteLine($"Base de datos temporal '{databaseName}' eliminada exitosamente.");
+        }
+        catch (SqlException ex)
+        {
+            Console.WriteLine($"Error SQL al eliminar la base de datos '{databaseName}': {ex.Message}");
+            throw;
+        }
     }
-
     private async Task CreateEmptyDatabaseAsync(string serverName,
                                                         string databaseName,
                                                         string? username,

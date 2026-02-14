@@ -2,6 +2,7 @@
 using GestionBD.Application.Abstractions.Services;
 using GestionBD.Application.Contracts.Instancias;
 using GestionBD.Application.Entregables.Commands;
+using GestionBD.Domain;
 using GestionBD.Domain.Services;
 using GestionBD.Domain.ValueObjects;
 using MediatR;
@@ -19,13 +20,15 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
         private readonly IInstanciaReadRepository _instanciaReadRepository;
         private readonly IRollbackGenerationService _rollbackScriptGeneratorService;
         private readonly IRollbackService _rollbackService;
+        private readonly IUnitOfWork _unitOfWork;
         public GenerateRollbackCommandHandler(IScriptRegexService scriptRegexService,
                                               IEntregableReadRepository entregableReadRepository,
                                               IArtefactoReadRepository artefactoReadRepository,
                                               IDatabaseService databaseService,
                                               IInstanciaReadRepository instanciaReadRepository,
                                               IRollbackGenerationService rollbackScriptGeneratorService,
-                                              IRollbackService rollbackService)
+                                              IRollbackService rollbackService,
+                                              IUnitOfWork unitOfWork)
         {
             _scriptRegexService = scriptRegexService;
             _entregableReadRepository = entregableReadRepository;
@@ -34,44 +37,57 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
             _rollbackScriptGeneratorService = rollbackScriptGeneratorService;
             _instanciaReadRepository = instanciaReadRepository;
             _rollbackService = rollbackService;
+            _unitOfWork = unitOfWork;
         }
         public async Task<string?> Handle(GenerateRollbackCommand request, CancellationToken cancellationToken)
         {
-            var entregable = await _entregableReadRepository.GetByIdAsync(
-            request.idEntregable,
-            cancellationToken);
-
-            if (entregable == null)
-                throw new InvalidOperationException(
-                    $"No se encontró el entregable con ID {request.idEntregable}");
-            // 1.1 Obtener detalles de conexión
-            var datosInstancia = await _instanciaReadRepository.GetConnectionDetailsByEntregableIdAsync(entregable.IdEntregable, cancellationToken);
-
-            if (datosInstancia == null)
-                throw new InvalidOperationException($"No se encontró conexion parametrizada con ID {request.idEntregable}");
-
-            var artefactos = await _artefactoReadRepository.GetByEntregableIdAsync(
-                request.idEntregable,
-                cancellationToken);
-
-            var artefactosEntidades = artefactos.Select(a => new Domain.Entities.TblArtefacto
+            
+            try
             {
-                IdArtefacto = a.IdArtefacto,
-                IdEntregable = a.IdEntregable,
-                OrdenEjecucion = a.OrdenEjecucion,
-                Codificacion = a.Codificacion,
-                NombreArtefacto = a.NombreArtefacto,
-                RutaRelativa = a.RutaRelativa,
-                EsReverso = a.EsReverso
-            }).ToList();
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+                var entregable = await _entregableReadRepository.GetByIdAsync(request.idEntregable,cancellationToken);
 
-            var scripts = ScriptDeployment.ExtractScriptsFromZip(
-                entregable.RutaEntregable,
-                artefactosEntidades);
+                if (entregable == null)
+                    throw new InvalidOperationException(
+                        $"No se encontró el entregable con ID {request.idEntregable}");
+                // 1.1 Obtener detalles de conexión
+                var datosInstancia = await _instanciaReadRepository.GetConnectionDetailsByEntregableIdAsync(entregable.IdEntregable, cancellationToken);
 
-            var rollbackResponses = await getRollbackResponses(scripts,datosInstancia);
-            var zipPath = await _rollbackService.GenerateRollbackScriptAsync(rollbackResponses,entregable.RutaEntregable,cancellationToken);
-            return string.IsNullOrEmpty(zipPath) ? "No se pudo generar el archivo" : $"Archivo de rollback generado en la ruta: {zipPath}";
+                if (datosInstancia == null)
+                    throw new InvalidOperationException($"No se encontró conexion parametrizada con ID {request.idEntregable}");
+
+                var artefactos = await _artefactoReadRepository.GetByEntregableIdAsync(
+                    request.idEntregable,
+                    cancellationToken);
+
+                var artefactosEntidades = artefactos.Select(a => new Domain.Entities.TblArtefacto
+                {
+                    IdArtefacto = a.IdArtefacto,
+                    IdEntregable = a.IdEntregable,
+                    OrdenEjecucion = a.OrdenEjecucion,
+                    Codificacion = a.Codificacion,
+                    NombreArtefacto = a.NombreArtefacto,
+                    RutaRelativa = a.RutaRelativa,
+                    EsReverso = a.EsReverso
+                }).ToList();
+
+                var scripts = ScriptDeployment.ExtractScriptsFromZip(
+                    entregable.RutaEntregable,
+                    artefactosEntidades);
+
+                var rollbackResponses = await getRollbackResponses(scripts, datosInstancia);
+                var zipPath = await _rollbackService.GenerateRollbackScriptAsync(rollbackResponses, entregable.RutaEntregable, cancellationToken);
+
+                await _unitOfWork.Entregables.UpdateEstado(request.idEntregable, Domain.Enum.EstadoEntregaEnum.Rollback, cancellationToken);
+                await _unitOfWork.Entregables.UpdateRutaRollback(request.idEntregable, zipPath, cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                return string.IsNullOrEmpty(zipPath) ? "No se pudo generar el archivo" : $"Archivo de rollback generado en la ruta: {zipPath}";
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                return $"Error al generar el archivo de rollback: {ex.Message}";
+            }
         }
         private async Task<List<RollbackGeneration>> getRollbackResponses(IEnumerable<ScriptDeployment> scripts, InstanciaConnectResponse instanciaConnectResponse)
         {

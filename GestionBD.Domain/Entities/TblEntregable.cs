@@ -17,6 +17,8 @@ public partial class TblEntregable
     public decimal? IdEstado { get; set; }
     public string? RutaResultado { get; set; }
 
+    public string? RutaRollbackGenerado { get; set; }
+
     public virtual TblEjecucione IdEjecucionNavigation { get; set; } = null!;
 
     public virtual ICollection<TblArtefacto> TblArtefactos { get; set; } = new List<TblArtefacto>();
