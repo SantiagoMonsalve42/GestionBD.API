@@ -1,13 +1,15 @@
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
+using GestionBD.Application.Contracts.Ejecuciones;
 using GestionBD.Application.Ejecuciones.Commands;
 using GestionBD.Application.Ejecuciones.Queries;
-using GestionBD.Application.Contracts.Ejecuciones;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GestionBD.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public sealed class EjecucionesController : ControllerBase
 {
     private readonly IMediator _mediator;

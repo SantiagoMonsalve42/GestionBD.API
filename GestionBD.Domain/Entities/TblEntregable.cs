@@ -15,6 +15,9 @@ public partial class TblEntregable
     public string? TemporalBD { get; set; }
 
     public decimal? IdEstado { get; set; }
+    public string? RutaResultado { get; set; }
+
+    public string? RutaRollbackGenerado { get; set; }
 
     public virtual TblEjecucione IdEjecucionNavigation { get; set; } = null!;
 

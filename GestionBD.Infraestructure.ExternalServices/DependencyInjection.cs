@@ -1,4 +1,6 @@
 using GestionBD.Application.Abstractions.Config;
+using GestionBD.Domain.Services;
+using GestionBD.Infraestructure.ExternalServices.OpenAI;
 using GestionBD.Infraestructure.ExternalServices.Vault;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,12 +31,18 @@ public static class DependencyInjection
         var fileStorageSettings = await loader.LoadFileStorageSettingsAsync();
         var connectionStringsSettings = await loader.LoadConnectionStringsAsync();
         var openIASettings = await loader.LoadOpenIASettingsAsync();
+        var keycloakSettings = await loader.LoadKeycloakSettingsAsync();
 
         // 4. Registrar configuraciones con IOptions
         services.AddSingleton(Microsoft.Extensions.Options.Options.Create(dacpacSettings));
         services.AddSingleton(Microsoft.Extensions.Options.Options.Create(fileStorageSettings));
         services.AddSingleton(Microsoft.Extensions.Options.Options.Create(connectionStringsSettings));
         services.AddSingleton(Microsoft.Extensions.Options.Options.Create(openIASettings));
+        services.AddSingleton(Microsoft.Extensions.Options.Options.Create(keycloakSettings));
+
+        // 5. Registrar HttpClient y servicio de OpenAI
+        services.AddHttpClient<ISqlValidationService, OpenAISqlValidationService>();
+        services.AddHttpClient<IRollbackGenerationService, OpenAIRollbackGenerationService>();
 
         return services;
     }

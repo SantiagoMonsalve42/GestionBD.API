@@ -1,13 +1,15 @@
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
+using GestionBD.Application.Contracts.LogEventos;
 using GestionBD.Application.LogEventos.Commands;
 using GestionBD.Application.LogEventos.Queries;
-using GestionBD.Application.Contracts.LogEventos;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GestionBD.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public sealed class LogEventosController : ControllerBase
 {
     private readonly IMediator _mediator;

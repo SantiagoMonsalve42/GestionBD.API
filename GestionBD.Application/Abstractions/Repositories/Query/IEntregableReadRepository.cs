@@ -6,4 +6,5 @@ public interface IEntregableReadRepository : IReadRepository<EntregableResponseE
 {
     Task<int> GetEntregablesByEjecucion(decimal idEjecucion);
     Task<IEnumerable<EntregableResponseEstado>> GetAllByIdEjecucionAsync(decimal idEjecucion,CancellationToken cancellationToken = default);
+    Task<IEnumerable<EntregableRevisionResponse>> GetAllRevisionesAsync(CancellationToken cancellationToken = default);
 }

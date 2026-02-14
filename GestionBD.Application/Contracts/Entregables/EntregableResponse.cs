@@ -19,5 +19,15 @@ public sealed record EntregableResponseEstado(
     string? RutaDACPAC,
     string? TemporalBD,
     string EstadoEntrega,
-    int EstadoEntregaId
+    int EstadoEntregaId,
+    string? RutaResultado,
+    string? RutaResultadoRollback
+);
+
+public sealed record EntregableRevisionResponse(
+    decimal IdEntregable,
+    string RutaEntregable,
+    string NombreRequerimiento,
+    string DescripcionEntregable,
+    int NumeroEntrega
 );

@@ -1,13 +1,15 @@
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
+using GestionBD.Application.Contracts.Parametros;
 using GestionBD.Application.Parametros.Commands;
 using GestionBD.Application.Parametros.Queries;
-using GestionBD.Application.Contracts.Parametros;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GestionBD.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public sealed class ParametrosController : ControllerBase
 {
     private readonly IMediator _mediator;

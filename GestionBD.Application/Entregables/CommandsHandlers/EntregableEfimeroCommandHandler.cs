@@ -31,7 +31,7 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
                 if (entregable == null)
                     throw new InvalidOperationException($"No se encontraron detalles de conexión para el entregable {request.idEntregable}");
 
-                if (entregable.TemporalBD != null)
+                if (!string.IsNullOrEmpty(entregable.TemporalBD))
                     await _dacpacService.DropTemporaryDatabaseAsync(entregable.TemporalBD);
 
 

@@ -1,13 +1,15 @@
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
+using GestionBD.Application.Contracts.Motores;
 using GestionBD.Application.Motores.Commands;
 using GestionBD.Application.Motores.Queries;
-using GestionBD.Application.Contracts.Motores;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GestionBD.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public sealed class MotoresController : ControllerBase
 {
     private readonly IMediator _mediator;

@@ -79,7 +79,6 @@ namespace GestionBD.Domain.ValueObjects
             {
                 var trimmedLine = line.Trim();
                 
-                // Saltar líneas USE [DatabaseName]
                 if (IsUseDatabaseStatement(trimmedLine))
                 {
                     continue;

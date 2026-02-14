@@ -48,7 +48,7 @@ public sealed class CreateEntregableWithFileCommandHandler : IRequestHandler<Cre
                 cancellationToken);
             
 
-            if (entregableExistente.Any(x=> x.IdEjecucion != (int)EstadoEntregaEnum.Cerrado))
+            if (entregableExistente.Any(x=> x.EstadoEntregaId != (int)EstadoEntregaEnum.Cerrado))
             {
 
                 throw new ValidationException("EntregableExistente", "Ya existe un entregable abierto, primero cierrelo antes de crear otro.");

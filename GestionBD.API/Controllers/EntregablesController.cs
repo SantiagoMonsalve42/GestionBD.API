@@ -1,13 +1,15 @@
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
+using GestionBD.Application.Contracts.Entregables;
 using GestionBD.Application.Entregables.Commands;
 using GestionBD.Application.Entregables.Queries;
-using GestionBD.Application.Contracts.Entregables;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GestionBD.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public sealed class EntregablesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -46,6 +48,17 @@ public sealed class EntregablesController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var entregables = await _mediator.Send(new GetAllEntregablesQuery());
+        return Ok(entregables);
+    }
+    /// <summary>
+    /// Obtiene todos los entregables para revisión
+    /// </summary>
+    [HttpGet("revision")]
+    [Authorize(Policy = "AdminOnly")]
+    [ProducesResponseType(typeof(IEnumerable<EntregableRevisionResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> getAllRevision()
+    {
+        var entregables = await _mediator.Send(new GetEntregablesRevisionQuery());
         return Ok(entregables);
     }
     /// <summary>

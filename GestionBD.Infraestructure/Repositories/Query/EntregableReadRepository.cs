@@ -26,7 +26,9 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
             	ent.rutaDACPAC as RutaDACPAC,
             	ent.temporalBD as TemporalBD,
                 est.descripcionEstado as EstadoEntrega,
-            	est.idEstado as EstadoEntregaId
+            	est.idEstado as EstadoEntregaId,
+                ent.rutaResultado as RutaResultado,
+                ent.rutaRollbackGenerado as RutaResultadoRollback
             FROM dbo.tbl_Entregables ent
             JOIN dbo.tbl_EstadoEntrega est
             on ent.idEstado = est.idEstado
@@ -48,15 +50,35 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
                	ent.rutaDACPAC as RutaDACPAC,
                	ent.temporalBD as TemporalBD,
             	est.descripcionEstado as EstadoEntrega,
-            	est.idEstado as EstadoEntregaId
+            	est.idEstado as EstadoEntregaId,
+                ent.rutaResultado as RutaResultado,
+                ent.rutaRollbackGenerado as RutaResultadoRollback
             FROM dbo.tbl_Entregables ent
             JOIN dbo.tbl_EstadoEntrega est
             on ent.idEstado = est.idEstado
             where ent.idEjecucion = @Id
-            ORDER BY ent.idEntregable DESC;
+            ORDER BY ent.idEntregable ;
             """;
 
         return await _connection.QueryAsync<EntregableResponseEstado>(sql, new { Id = idEjecucion });
+    }
+
+    public async Task<IEnumerable<EntregableRevisionResponse>> GetAllRevisionesAsync(CancellationToken cancellationToken = default)
+    {
+        const string sql = """
+              SELECT  en.idEntregable as IdEntregable,
+            		en.rutaEntregable as RutaEntregable,
+            		ej.nombreRequerimiento as NombreRequerimiento,
+            		ej.descripcion as DescripcionEntregable,
+            		en.numeroEntrega as NumeroEntrega
+              FROM [dbo].[tbl_Entregables] en
+              JOIN [dbo].[tbl_Ejecuciones] ej
+              ON en.idEjecucion = ej.idEjecucion
+              where idEstado = 7
+              order by 1 desc;
+            """;
+
+        return await _connection.QueryAsync<EntregableRevisionResponse>(sql);
     }
 
     public async Task<EntregableResponseEstado?> GetByIdAsync(decimal id, CancellationToken cancellationToken = default)
@@ -71,7 +93,9 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
             	ent.rutaDACPAC as RutaDACPAC,
             	ent.temporalBD as TemporalBD,
                 est.descripcionEstado as EstadoEntrega,
-            	est.idEstado as EstadoEntregaId
+            	est.idEstado as EstadoEntregaId,
+                ent.rutaResultado as RutaResultado,
+                ent.rutaRollbackGenerado as RutaResultadoRollback
             FROM dbo.tbl_Entregables ent
             JOIN dbo.tbl_EstadoEntrega est
             on ent.idEstado = est.idEstado
