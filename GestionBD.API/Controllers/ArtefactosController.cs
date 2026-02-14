@@ -13,7 +13,6 @@ namespace GestionBD.API.Controllers;
 public sealed class ArtefactosController : ControllerBase
 {
     private readonly IMediator _mediator;
-
     public ArtefactosController(IMediator mediator)
     {
         _mediator = mediator;
