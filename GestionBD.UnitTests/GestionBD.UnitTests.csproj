@@ -26,7 +26,6 @@
     <Folder Include="Infrastructure\" />
     <Folder Include="Infrastructure.ExternalServices\" />
     <Folder Include="Application\" />
-    <Folder Include="Utils\" />
   </ItemGroup>
 
   <ItemGroup>
