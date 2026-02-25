@@ -23,10 +23,13 @@
   <ItemGroup>
     <Folder Include="Infrastructure\" />
     <Folder Include="Infrastructure.ExternalServices\" />
-    <Folder Include="Domain\" />
     <Folder Include="Application\" />
     <Folder Include="API\" />
     <Folder Include="Utils\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GestionBD.Domain\GestionBD.Domain.csproj" />
   </ItemGroup>
 
 </Project>
