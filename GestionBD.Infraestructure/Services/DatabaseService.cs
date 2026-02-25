@@ -1,13 +1,13 @@
-﻿using System.Data;
-using GestionBD.Application.Abstractions.Services;
+﻿using GestionBD.Application.Abstractions.Services;
 using GestionBD.Utils;
 using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace GestionBD.Infrastructure.Services;
 
 public sealed class DatabaseService : IDatabaseService
 {
-    
+
 
     public async Task<string> getObjectDefinition(
         string serverName,
@@ -26,10 +26,10 @@ public sealed class DatabaseService : IDatabaseService
             throw new ArgumentException("El nombre del objeto no puede estar vacío", nameof(objectName));
 
         var connectionString = SqlConnectionStringHelper.BuildConnectionString(
-            serverName, 
-            databaseName, 
-            user, 
-            password, 
+            serverName,
+            databaseName,
+            user,
+            password,
             SqlConnectionOptions.DatabaseService);
 
         try

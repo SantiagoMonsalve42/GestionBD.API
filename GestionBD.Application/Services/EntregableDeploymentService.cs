@@ -1,4 +1,3 @@
-using Azure.Core;
 using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Abstractions.Services;
 using GestionBD.Application.Contracts.Entregables;
@@ -97,7 +96,7 @@ namespace GestionBD.Application.Services
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 throw;
             }
-            
+
         }
         public async Task<IEnumerable<EntregablePreValidateResponse>> DeployAsync(
             decimal idEntregable,
@@ -156,11 +155,11 @@ namespace GestionBD.Application.Services
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 throw;
             }
-            
+
         }
         private async Task<EntregablePreValidateResponse> ExecuteScriptAsync(
             ScriptDeployment script,
-            string databaseName, 
+            string databaseName,
             string? serverName = null,
             string? username = null,
             string? password = null,
@@ -172,7 +171,7 @@ namespace GestionBD.Application.Services
 
                 foreach (var batch in batches)
                 {
-                    await _scriptExecutor.ExecuteAsync(databaseName, 
+                    await _scriptExecutor.ExecuteAsync(databaseName,
                                                         batch,
                                                         serverName,
                                                         username,

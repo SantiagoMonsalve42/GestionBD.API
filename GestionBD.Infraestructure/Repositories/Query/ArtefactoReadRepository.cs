@@ -1,7 +1,7 @@
-using System.Data;
 using Dapper;
 using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Contracts.Artefactos;
+using System.Data;
 
 namespace GestionBD.Infrastructure.Repositories.Query;
 
@@ -52,7 +52,7 @@ public sealed class ArtefactoReadRepository : IArtefactoReadRepository
             ORDER BY a.ordenEjecucion;
             """;
 
-        return await _connection.QueryAsync<ArtefactoResponse>(sql, new {Id = id});
+        return await _connection.QueryAsync<ArtefactoResponse>(sql, new { Id = id });
     }
 
     public async Task<ArtefactoResponse?> GetByIdAsync(decimal id, CancellationToken cancellationToken = default)

@@ -16,8 +16,8 @@ public sealed class ArtefactoRepository : Repository<TblArtefacto>, IArtefactoRe
         foreach (var item in listado)
         {
             var artefacto = await _context.TblArtefactos.FirstOrDefaultAsync(x => x.IdArtefacto == item.Key);
-            if (artefacto == null) 
-                throw new KeyNotFoundException("El artefacto no existe");                
+            if (artefacto == null)
+                throw new KeyNotFoundException("El artefacto no existe");
             artefacto.OrdenEjecucion = item.Value;
             _context.TblArtefactos.Update(artefacto);
             await _context.SaveChangesAsync();

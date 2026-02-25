@@ -1,7 +1,7 @@
-using MediatR;
-using GestionBD.Application.Contracts.Artefactos;
 using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Artefactos.Queries;
+using GestionBD.Application.Contracts.Artefactos;
+using MediatR;
 
 namespace GestionBD.Application.Artefactos.QueriesHandlers;
 

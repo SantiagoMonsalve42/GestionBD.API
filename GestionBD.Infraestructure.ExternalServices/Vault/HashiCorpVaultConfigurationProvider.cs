@@ -17,7 +17,7 @@ public sealed class HashiCorpVaultConfigurationProvider : IVaultConfigurationPro
     {
         if (string.IsNullOrWhiteSpace(vaultUri))
             throw new ArgumentException("VaultUri no puede estar vacío", nameof(vaultUri));
-        
+
         if (string.IsNullOrWhiteSpace(token))
             throw new ArgumentException("Token no puede estar vacío", nameof(token));
 
@@ -26,11 +26,11 @@ public sealed class HashiCorpVaultConfigurationProvider : IVaultConfigurationPro
         _vaultClient = new VaultClient(vaultClientSettings);
     }
 
-    public async Task<T> GetConfigurationAsync<T>(string path, CancellationToken cancellationToken = default) 
+    public async Task<T> GetConfigurationAsync<T>(string path, CancellationToken cancellationToken = default)
         where T : class, new()
     {
         var secrets = await GetSecretsAsync(path, cancellationToken);
-        
+
         // Convertir el diccionario a JSON y luego deserializar al tipo T
         var json = JsonSerializer.Serialize(secrets);
         var result = JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions

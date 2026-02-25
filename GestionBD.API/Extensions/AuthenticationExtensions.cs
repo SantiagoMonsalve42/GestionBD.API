@@ -45,34 +45,34 @@ public static class AuthenticationExtensions
                 {
                     var logger = context.HttpContext.RequestServices
                         .GetRequiredService<ILogger<Program>>();
-                    
-                    logger.LogError(context.Exception, 
+
+                    logger.LogError(context.Exception,
                         "Error de autenticación: {Message}", context.Exception.Message);
-                    
+
                     return Task.CompletedTask;
                 },
                 OnTokenValidated = context =>
                 {
                     var logger = context.HttpContext.RequestServices
                         .GetRequiredService<ILogger<Program>>();
-                    
+
                     logger.LogInformation(
-                        "Token validado exitosamente para usuario: {User}", 
+                        "Token validado exitosamente para usuario: {User}",
                         context.Principal?.Identity?.Name ?? "Unknown");
 
                     TransformKeycloakRoles(context);
-                    
+
                     return Task.CompletedTask;
                 },
                 OnChallenge = context =>
                 {
                     var logger = context.HttpContext.RequestServices
                         .GetRequiredService<ILogger<Program>>();
-                    
+
                     logger.LogWarning(
-                        "Challenge emitido: {Error}, {ErrorDescription}", 
+                        "Challenge emitido: {Error}, {ErrorDescription}",
                         context.Error, context.ErrorDescription);
-                    
+
                     return Task.CompletedTask;
                 }
             };
@@ -96,7 +96,7 @@ public static class AuthenticationExtensions
                 policy.RequireRole("user", "admin");
             });
 
-            
+
         });
 
         return services;

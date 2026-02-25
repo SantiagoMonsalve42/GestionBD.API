@@ -53,9 +53,9 @@ public sealed class DacpacService : IDacpacService
 
         // ✅ Usar la nueva clase Utils
         var connectionString = SqlConnectionStringHelper.BuildConnectionString(
-            serverName, 
-            databaseName, 
-            username, 
+            serverName,
+            databaseName,
+            username,
             password);
 
         var dacServices = new DacServices(connectionString);
@@ -92,14 +92,14 @@ public sealed class DacpacService : IDacpacService
             tempDatabaseName = $"TempDB_{Guid.NewGuid():N}";
             await CreateEmptyDatabaseAsync(serverName, tempDatabaseName, username, password, cancellationToken);
         }
-        
+
         try
         {
             // ✅ Usar la nueva clase Utils
             var connectionString = SqlConnectionStringHelper.BuildConnectionString(
-                serverName, 
-                tempDatabaseName, 
-                username, 
+                serverName,
+                tempDatabaseName,
+                username,
                 password);
 
             var dacServices = new DacServices(connectionString);
@@ -223,9 +223,9 @@ public sealed class DacpacService : IDacpacService
     {
         // ✅ Usar la nueva clase Utils
         var connectionString = SqlConnectionStringHelper.BuildConnectionString(
-            serverName, 
-            "master", 
-            username, 
+            serverName,
+            "master",
+            username,
             password);
 
         await using var connection = new SqlConnection(connectionString);

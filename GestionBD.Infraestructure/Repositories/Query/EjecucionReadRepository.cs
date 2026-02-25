@@ -1,7 +1,7 @@
-using System.Data;
 using Dapper;
 using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Contracts.Ejecuciones;
+using System.Data;
 
 namespace GestionBD.Infrastructure.Repositories.Query;
 

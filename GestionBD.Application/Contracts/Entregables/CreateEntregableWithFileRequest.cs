@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace GestionBD.Application.Contracts.Entregables;
 
@@ -8,7 +8,7 @@ public sealed class CreateEntregableWithFileRequest
     [Required(ErrorMessage = "La descripción es requerida")]
     [MaxLength(150, ErrorMessage = "La descripción no puede exceder 150 caracteres")]
     public string DescripcionEntregable { get; set; } = null!;
-    
+
     [Required(ErrorMessage = "El ID de ejecución es requerido")]
     public decimal IdEjecucion { get; set; }
 

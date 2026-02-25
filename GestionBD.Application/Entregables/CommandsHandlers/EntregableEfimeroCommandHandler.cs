@@ -57,8 +57,9 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
                 await _unitOfWork.Entregables.UpdateEstado(request.idEntregable, Domain.Enum.EstadoEntregaEnum.Preparacion, cancellationToken);
                 await _unitOfWork.CommitTransactionAsync();
                 return $"DACPAC creado en: {dacpacPath}. Base de datos temporal creada: {tempDatabaseName}";
-                
-            }catch(Exception ex)
+
+            }
+            catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync();
                 throw new InvalidOperationException("No se pudo iniciar la transaccion.", ex);

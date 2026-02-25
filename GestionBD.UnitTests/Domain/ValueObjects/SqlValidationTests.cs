@@ -1,5 +1,4 @@
 using GestionBD.Domain.ValueObjects;
-using Xunit;
 
 namespace GestionBD.UnitTests.Domain.ValueObjects;
 

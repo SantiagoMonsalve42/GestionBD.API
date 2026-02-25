@@ -1,7 +1,7 @@
-using MediatR;
-using GestionBD.Application.Contracts.Parametros;
 using GestionBD.Application.Abstractions.Repositories.Query;
+using GestionBD.Application.Contracts.Parametros;
 using GestionBD.Application.Parametros.Queries;
+using MediatR;
 
 namespace GestionBD.Application.Parametros.QueriesHandlers;
 

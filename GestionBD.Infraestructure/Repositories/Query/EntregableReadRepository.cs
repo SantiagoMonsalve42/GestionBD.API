@@ -1,7 +1,7 @@
-using System.Data;
 using Dapper;
 using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Contracts.Entregables;
+using System.Data;
 
 namespace GestionBD.Infrastructure.Repositories.Query;
 
@@ -38,7 +38,7 @@ public sealed class EntregableReadRepository : IEntregableReadRepository
         return await _connection.QueryAsync<EntregableResponseEstado>(sql);
     }
 
-    public async Task<IEnumerable<EntregableResponseEstado>> GetAllByIdEjecucionAsync(decimal idEjecucion,CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<EntregableResponseEstado>> GetAllByIdEjecucionAsync(decimal idEjecucion, CancellationToken cancellationToken = default)
     {
         const string sql = """
                 SELECT 

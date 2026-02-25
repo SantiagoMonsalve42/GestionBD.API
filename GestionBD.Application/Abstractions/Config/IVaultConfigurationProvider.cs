@@ -9,7 +9,7 @@ public interface IVaultConfigurationProvider
     /// Obtiene configuración desde una ruta específica y la deserializa al tipo T
     /// </summary>
     Task<T> GetConfigurationAsync<T>(string path, CancellationToken cancellationToken = default) where T : class, new();
-    
+
     /// <summary>
     /// Obtiene todos los datos de una ruta como diccionario
     /// </summary>

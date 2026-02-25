@@ -1,6 +1,5 @@
 ﻿using GestionBD.Application.Abstractions.Services;
 using GestionBD.Application.Contracts.Entregables;
-using System.IO;
 using System.Text;
 
 namespace GestionBD.Infrastructure.Services;
@@ -8,8 +7,8 @@ namespace GestionBD.Infrastructure.Services;
 public sealed class DeployLog : IDeployLog
 {
     public async Task<string> GenerarArchivoLog(
-        IEnumerable<EntregablePreValidateResponse> respuestaEjecuciones, 
-        string ruta, 
+        IEnumerable<EntregablePreValidateResponse> respuestaEjecuciones,
+        string ruta,
         string nombreArchivo)
     {
         if (respuestaEjecuciones == null)
@@ -27,7 +26,7 @@ public sealed class DeployLog : IDeployLog
             nombreArchivo += ".txt";
         }
         ruta = Path.GetDirectoryName(ruta);
-        
+
         if (!Directory.Exists(ruta))
         {
             Directory.CreateDirectory(ruta);
@@ -61,8 +60,8 @@ public sealed class DeployLog : IDeployLog
         sb.AppendLine("─────────────────────────────────────────────────────────────────");
         sb.AppendLine("                         RESUMEN EJECUTIVO                        ");
         sb.AppendLine("─────────────────────────────────────────────────────────────────");
-        sb.AppendLine($"Scripts exitosos:    {exitosos} ({(respuestasList.Count > 0 ? (exitosos * 100.0 / respuestasList.Count):0):F2}%)");
-        sb.AppendLine($"Scripts fallidos:    {fallidos} ({(respuestasList.Count > 0 ? (fallidos * 100.0 / respuestasList.Count):0):F2}%)");
+        sb.AppendLine($"Scripts exitosos:    {exitosos} ({(respuestasList.Count > 0 ? (exitosos * 100.0 / respuestasList.Count) : 0):F2}%)");
+        sb.AppendLine($"Scripts fallidos:    {fallidos} ({(respuestasList.Count > 0 ? (fallidos * 100.0 / respuestasList.Count) : 0):F2}%)");
         sb.AppendLine();
 
         // Detalle de cada script
@@ -80,17 +79,17 @@ public sealed class DeployLog : IDeployLog
             sb.AppendLine(new string('─', 70));
             sb.AppendLine($"Estado:        {estado}");
             sb.AppendLine($"Status:        {respuesta.Status}");
-            
+
             if (!string.IsNullOrWhiteSpace(respuesta.Message))
             {
                 sb.AppendLine($"Mensaje:       {respuesta.Message}");
             }
-            
+
             if (!string.IsNullOrWhiteSpace(respuesta.AdditionalInfo))
             {
                 sb.AppendLine($"Info Adicional: {respuesta.AdditionalInfo}");
             }
-            
+
             sb.AppendLine();
             contador++;
         }

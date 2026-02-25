@@ -7,7 +7,7 @@ namespace GestionBD.Infrastructure.Services
 {
     public class RollbackService : IRollbackService
     {
-        public async Task<string> GenerateRollbackScriptAsync(List<RollbackGeneration> rollbackGenerations, 
+        public async Task<string> GenerateRollbackScriptAsync(List<RollbackGeneration> rollbackGenerations,
                                                         string? currentPath, CancellationToken cancellationToken)
         {
             if (rollbackGenerations == null || !rollbackGenerations.Any())
@@ -38,7 +38,7 @@ namespace GestionBD.Infrastructure.Services
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var entry = zipArchive.CreateEntry(script.FileName, CompressionLevel.Optimal);
-                
+
                 using var entryStream = entry.Open();
                 using var writer = new StreamWriter(entryStream, Encoding.UTF8);
                 await writer.WriteAsync(script.Script);

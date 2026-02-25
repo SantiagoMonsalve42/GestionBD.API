@@ -11,10 +11,10 @@ namespace GestionBD.Application.Abstractions.Services
         /// <param name="password">Contraseña (opcional si usa autenticación Windows)</param>
         /// <param name="cancellationToken">Token de cancelación</param>
         /// <returns>Ruta completa del archivo DACPAC generado</returns>
-        Task<string> ExtractDacpacAsync(string serverName, 
-                                        string databaseName, 
-                                        string? username = null, 
-                                        string? password = null, 
+        Task<string> ExtractDacpacAsync(string serverName,
+                                        string databaseName,
+                                        string? username = null,
+                                        string? password = null,
                                         CancellationToken cancellationToken = default);
 
         /// <summary>

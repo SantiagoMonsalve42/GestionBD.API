@@ -33,10 +33,10 @@ public sealed class SqlValidation
         );
     }
 
-    public static SqlValidation Valid() => 
+    public static SqlValidation Valid() =>
         new(true, [], [], []);
 
-    public static SqlValidation Invalid(params ValidationError[] errors) => 
+    public static SqlValidation Invalid(params ValidationError[] errors) =>
         new(false, errors.ToList().AsReadOnly(), [], []);
 
     public bool HasErrors => Errors.Any();

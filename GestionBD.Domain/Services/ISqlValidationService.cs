@@ -6,6 +6,6 @@ public interface ISqlValidationService
 {
     Task<SqlValidation> ValidateScriptAsync(
         bool isSecuencial,
-        string sqlScript, 
+        string sqlScript,
         CancellationToken cancellationToken = default);
 }

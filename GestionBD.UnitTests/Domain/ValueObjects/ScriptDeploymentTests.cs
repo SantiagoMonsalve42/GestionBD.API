@@ -1,8 +1,7 @@
-using System.IO.Compression;
-using System.Text;
 using GestionBD.Domain.Entities;
 using GestionBD.Domain.ValueObjects;
-using Xunit;
+using System.IO.Compression;
+using System.Text;
 
 namespace GestionBD.UnitTests.Domain.ValueObjects;
 
@@ -83,7 +82,7 @@ public sealed class ScriptDeploymentTests
         using var tempZip = new TemporaryZip();
         tempZip.AddEntry("script1.sql", "SELECT 1;");
         tempZip.AddEntry("script2.sql", "SELECT 2;");
-        
+
         tempZip.Dispose();
 
         var artefactos = new[]

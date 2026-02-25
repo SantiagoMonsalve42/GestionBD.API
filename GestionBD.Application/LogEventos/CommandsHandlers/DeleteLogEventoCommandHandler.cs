@@ -1,7 +1,7 @@
-using MediatR;
+using GestionBD.Application.LogEventos.Commands;
 using GestionBD.Domain;
 using GestionBD.Domain.Entities;
-using GestionBD.Application.LogEventos.Commands;
+using MediatR;
 
 namespace GestionBD.Application.LogEventos.CommandsHandlers;
 

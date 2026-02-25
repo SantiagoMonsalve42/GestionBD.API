@@ -20,9 +20,9 @@ public sealed class EntregableRepository : Repository<TblEntregable>, IEntregabl
         return result > 0;
     }
 
-    public async Task<bool> UpdateDACPAC(decimal idEntregable, string rutaDacpac,string temporalBD, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateDACPAC(decimal idEntregable, string rutaDacpac, string temporalBD, CancellationToken cancellationToken = default)
     {
-        var result = await _context.TblEntregables.Where(x=> x.IdEntregable == idEntregable)
+        var result = await _context.TblEntregables.Where(x => x.IdEntregable == idEntregable)
             .ExecuteUpdateAsync(setters => setters
                 .SetProperty(b => b.RutaDACPAC, rutaDacpac)
                 .SetProperty(c => c.TemporalBD, temporalBD), cancellationToken);

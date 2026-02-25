@@ -1,13 +1,13 @@
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using GestionBD.Application.Configuration;
 using GestionBD.Application.DTO.OpenAI;
 using GestionBD.Domain.Services;
 using GestionBD.Domain.ValueObjects;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace GestionBD.Infrastructure.ExternalServices.OpenAI;
 
@@ -48,19 +48,19 @@ public sealed class OpenAIRollbackGenerationService : IRollbackGenerationService
         {
             var request = BuildRollbackRequest(newObjectsDefinitions, currentObjectsDefinitions);
             _logger.LogInformation(
-                "Enviando definiciones a OpenAI para generar rollback. Nuevas: {NewLength} caracteres, Actuales: {CurrentLength} caracteres", 
+                "Enviando definiciones a OpenAI para generar rollback. Nuevas: {NewLength} caracteres, Actuales: {CurrentLength} caracteres",
                 newObjectsDefinitions.Length, currentObjectsDefinitions.Length);
 
             var response = await _httpClient.PostAsJsonAsync(
-                "/v1/responses", 
-                request, 
-                JsonOptions, 
+                "/v1/responses",
+                request,
+                JsonOptions,
                 cancellationToken);
 
             response.EnsureSuccessStatusCode();
 
             var openAIResponse = await response.Content.ReadFromJsonAsync<OpenAIValidationResponse>(
-                JsonOptions, 
+                JsonOptions,
                 cancellationToken);
 
             if (openAIResponse == null)
@@ -98,14 +98,14 @@ public sealed class OpenAIRollbackGenerationService : IRollbackGenerationService
             throw new InvalidOperationException("OpenAI Model no está configurada");
 
         _httpClient.BaseAddress = new Uri(_settings.BaseURL);
-        _httpClient.DefaultRequestHeaders.Authorization = 
+        _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", _settings.ApiKey);
         _httpClient.DefaultRequestHeaders.Add("OpenAI-Beta", "responses=v1");
         _httpClient.Timeout = TimeSpan.FromMinutes(2); // Rollback puede tardar más
     }
 
     private RollbackGenerationRequest BuildRollbackRequest(
-        string newObjectsDefinitions, 
+        string newObjectsDefinitions,
         string currentObjectsDefinitions)
     {
         var model = _settings.Model;
@@ -149,16 +149,14 @@ public sealed class OpenAIRollbackGenerationService : IRollbackGenerationService
                             No incluyas reasoning, análisis, pensamientos internos ni explicaciones.
                             No incluyas campos distintos a los definidos en la interfaz JSON.
                             Genera el rollback basándote estrictamente en el contexto proporcionado.";
-        
-                                    var userPrompt = $@"DEFINICIONES NUEVAS (a desplegar):
+
+        var userPrompt = $@"DEFINICIONES NUEVAS (a desplegar):
                             {newObjectsDefinitions}
 
                             DEFINICIONES ACTUALES (pre-deploy):
-                            {
-                            ((string.IsNullOrEmpty(currentObjectsDefinitions)) 
-                            ? "No existen"
-                            :currentObjectsDefinitions)
-                            }
+                            {((string.IsNullOrEmpty(currentObjectsDefinitions))
+? "No existen"
+: currentObjectsDefinitions)}
 
                             Genera los scripts de rollback necesarios para restaurar el estado previo al despliegue.";
 
@@ -201,12 +199,12 @@ public sealed class OpenAIRollbackGenerationService : IRollbackGenerationService
         }
 
         var textContent = messageOutput.Content.First().Text;
-        
+
         var rollbackDto = JsonSerializer.Deserialize<RollbackDto>(
-            textContent, 
-            new JsonSerializerOptions 
-            { 
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase 
+            textContent,
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
 
         if (rollbackDto == null)
@@ -229,7 +227,7 @@ public sealed class OpenAIRollbackGenerationService : IRollbackGenerationService
         );
     }
 
-    
+
     private sealed record RollbackDto(
         MetadataDto Metadata,
         List<RollbackScriptDto>? RollbackScripts,

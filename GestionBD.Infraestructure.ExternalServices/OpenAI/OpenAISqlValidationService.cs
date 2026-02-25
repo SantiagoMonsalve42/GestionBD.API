@@ -1,13 +1,13 @@
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using GestionBD.Application.Configuration;
 using GestionBD.Application.DTO.OpenAI;
 using GestionBD.Domain.Services;
 using GestionBD.Domain.ValueObjects;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace GestionBD.Infrastructure.ExternalServices.OpenAI;
 
@@ -46,22 +46,22 @@ public sealed class OpenAISqlValidationService : ISqlValidationService
 
         try
         {
-            var request = BuildValidationRequest(isSecuencial,sqlScript);
-            
+            var request = BuildValidationRequest(isSecuencial, sqlScript);
+
             _logger.LogInformation(
-                "Enviando script SQL a OpenAI para validación. Longitud: {Length} caracteres", 
+                "Enviando script SQL a OpenAI para validación. Longitud: {Length} caracteres",
                 sqlScript.Length);
 
-         var response = await _httpClient.PostAsJsonAsync(
-                "/v1/responses", 
-                request, 
-                JsonOptions, 
-                cancellationToken);
+            var response = await _httpClient.PostAsJsonAsync(
+                   "/v1/responses",
+                   request,
+                   JsonOptions,
+                   cancellationToken);
 
             response.EnsureSuccessStatusCode();
 
             var openAIResponse = await response.Content.ReadFromJsonAsync<OpenAIValidationResponse>(
-                JsonOptions, 
+                JsonOptions,
                 cancellationToken);
 
             if (openAIResponse == null)
@@ -99,20 +99,20 @@ public sealed class OpenAISqlValidationService : ISqlValidationService
             throw new InvalidOperationException("OpenAI Model no está configurada");
 
         _httpClient.BaseAddress = new Uri(_settings.BaseURL);
-        _httpClient.DefaultRequestHeaders.Authorization = 
+        _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", _settings.ApiKey);
         _httpClient.DefaultRequestHeaders.Add("OpenAI-Beta", "responses=v1");
         _httpClient.Timeout = TimeSpan.FromSeconds(60);
     }
 
-    private OpenAIValidationRequest BuildValidationRequest(bool isSecuencial,string sqlScript)
+    private OpenAIValidationRequest BuildValidationRequest(bool isSecuencial, string sqlScript)
     {
         var model = _settings.Model;
         var maxTokens = int.TryParse(_settings.MaxTokens, out var tokens) ? tokens : 600;
 
         var systemPrompt = "Eres un motor automático de validación SQL. No expliques razonamientos internos. Responde únicamente un objeto JSON válido.";
-        
-        var userPrompt = (!isSecuencial)? $@"CASO_USO: VALIDACION_SQL
+
+        var userPrompt = (!isSecuencial) ? $@"CASO_USO: VALIDACION_SQL
 
                             REGLAS:
                             - No usar DROP sin IF EXISTS
@@ -133,7 +133,7 @@ public sealed class OpenAISqlValidationService : ISqlValidationService
                               ""warnings"": [{{ ""code"": string, ""message"": string }}],
                               ""suggestions"": [{{ ""code"": string, ""message"": string }}]
                             }}"
-                            : 
+                            :
                             $@"CASO_USO: VALIDAR QUE EN CASO DE EJECUTAR LOS SCRIPT EN EL ORDEN ESTABLECIDO, TODO FUNCIONE
 
                             REGLAS:
@@ -191,12 +191,12 @@ public sealed class OpenAISqlValidationService : ISqlValidationService
         }
 
         var textContent = messageOutput.Content.First().Text;
-        
+
         var validationDto = JsonSerializer.Deserialize<ValidationDto>(
-            textContent, 
-            new JsonSerializerOptions 
-            { 
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase 
+            textContent,
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
 
         if (validationDto == null)

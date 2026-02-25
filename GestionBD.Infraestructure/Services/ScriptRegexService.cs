@@ -1,5 +1,5 @@
-﻿using System.Text.RegularExpressions;
-using GestionBD.Application.Abstractions.Services;
+﻿using GestionBD.Application.Abstractions.Services;
+using System.Text.RegularExpressions;
 
 namespace GestionBD.Infrastructure.Services;
 
@@ -9,75 +9,75 @@ public sealed class ScriptRegexService : IScriptRegexService
     private static readonly Dictionary<string, Regex> SqlObjectPatterns = new(StringComparer.OrdinalIgnoreCase)
     {
         // Tablas
-        ["CREATE_TABLE"] = new Regex(@"CREATE\s+TABLE\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["CREATE_TABLE"] = new Regex(@"CREATE\s+TABLE\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["ALTER_TABLE"] = new Regex(@"ALTER\s+TABLE\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["ALTER_TABLE"] = new Regex(@"ALTER\s+TABLE\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["DROP_TABLE"] = new Regex(@"DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["DROP_TABLE"] = new Regex(@"DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
         // Índices
-        ["CREATE_INDEX"] = new Regex(@"CREATE\s+(?:UNIQUE\s+)?(?:CLUSTERED\s+|NONCLUSTERED\s+)?INDEX\s+\[?(?<name>\w+)\]?\s+ON\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<table>\w+)\]?", 
+        ["CREATE_INDEX"] = new Regex(@"CREATE\s+(?:UNIQUE\s+)?(?:CLUSTERED\s+|NONCLUSTERED\s+)?INDEX\s+\[?(?<name>\w+)\]?\s+ON\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<table>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["DROP_INDEX"] = new Regex(@"DROP\s+INDEX\s+(?:IF\s+EXISTS\s+)?\[?(?<name>\w+)\]?\s+ON\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<table>\w+)\]?", 
+        ["DROP_INDEX"] = new Regex(@"DROP\s+INDEX\s+(?:IF\s+EXISTS\s+)?\[?(?<name>\w+)\]?\s+ON\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<table>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
         // Stored Procedures
-        ["CREATE_PROCEDURE"] = new Regex(@"CREATE\s+(?:OR\s+ALTER\s+)?PROC(?:EDURE)?\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["CREATE_PROCEDURE"] = new Regex(@"CREATE\s+(?:OR\s+ALTER\s+)?PROC(?:EDURE)?\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["ALTER_PROCEDURE"] = new Regex(@"ALTER\s+PROC(?:EDURE)?\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["ALTER_PROCEDURE"] = new Regex(@"ALTER\s+PROC(?:EDURE)?\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["DROP_PROCEDURE"] = new Regex(@"DROP\s+PROC(?:EDURE)?\s+(?:IF\s+EXISTS\s+)?(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["DROP_PROCEDURE"] = new Regex(@"DROP\s+PROC(?:EDURE)?\s+(?:IF\s+EXISTS\s+)?(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["EXEC_PROCEDURE"] = new Regex(@"EXEC(?:UTE)?\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["EXEC_PROCEDURE"] = new Regex(@"EXEC(?:UTE)?\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
         // Funciones
-        ["CREATE_FUNCTION"] = new Regex(@"CREATE\s+(?:OR\s+ALTER\s+)?FUNCTION\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["CREATE_FUNCTION"] = new Regex(@"CREATE\s+(?:OR\s+ALTER\s+)?FUNCTION\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["ALTER_FUNCTION"] = new Regex(@"ALTER\s+FUNCTION\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["ALTER_FUNCTION"] = new Regex(@"ALTER\s+FUNCTION\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["DROP_FUNCTION"] = new Regex(@"DROP\s+FUNCTION\s+(?:IF\s+EXISTS\s+)?(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["DROP_FUNCTION"] = new Regex(@"DROP\s+FUNCTION\s+(?:IF\s+EXISTS\s+)?(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
         // Vistas
-        ["CREATE_VIEW"] = new Regex(@"CREATE\s+(?:OR\s+ALTER\s+)?VIEW\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["CREATE_VIEW"] = new Regex(@"CREATE\s+(?:OR\s+ALTER\s+)?VIEW\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["ALTER_VIEW"] = new Regex(@"ALTER\s+VIEW\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["ALTER_VIEW"] = new Regex(@"ALTER\s+VIEW\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["DROP_VIEW"] = new Regex(@"DROP\s+VIEW\s+(?:IF\s+EXISTS\s+)?(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["DROP_VIEW"] = new Regex(@"DROP\s+VIEW\s+(?:IF\s+EXISTS\s+)?(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
         // Triggers
-        ["CREATE_TRIGGER"] = new Regex(@"CREATE\s+(?:OR\s+ALTER\s+)?TRIGGER\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?\s+ON\s+(?:\[?(?<schema_target>\w+)\]?\.)?\[?(?<table>\w+)\]?", 
+        ["CREATE_TRIGGER"] = new Regex(@"CREATE\s+(?:OR\s+ALTER\s+)?TRIGGER\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?\s+ON\s+(?:\[?(?<schema_target>\w+)\]?\.)?\[?(?<table>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["DROP_TRIGGER"] = new Regex(@"DROP\s+TRIGGER\s+(?:IF\s+EXISTS\s+)?(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["DROP_TRIGGER"] = new Regex(@"DROP\s+TRIGGER\s+(?:IF\s+EXISTS\s+)?(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
         // Referencias a objetos en SELECT, INSERT, UPDATE, DELETE
-        ["SELECT_FROM"] = new Regex(@"FROM\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?(?:\s+(?:AS\s+)?\w+)?", 
+        ["SELECT_FROM"] = new Regex(@"FROM\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?(?:\s+(?:AS\s+)?\w+)?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["JOIN_TABLE"] = new Regex(@"(?:INNER\s+|LEFT\s+|RIGHT\s+|FULL\s+|CROSS\s+)?JOIN\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?(?:\s+(?:AS\s+)?\w+)?", 
+        ["JOIN_TABLE"] = new Regex(@"(?:INNER\s+|LEFT\s+|RIGHT\s+|FULL\s+|CROSS\s+)?JOIN\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?(?:\s+(?:AS\s+)?\w+)?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["INSERT_INTO"] = new Regex(@"INSERT\s+INTO\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["INSERT_INTO"] = new Regex(@"INSERT\s+INTO\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["UPDATE_TABLE"] = new Regex(@"UPDATE\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["UPDATE_TABLE"] = new Regex(@"UPDATE\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["DELETE_FROM"] = new Regex(@"DELETE\s+FROM\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?", 
+        ["DELETE_FROM"] = new Regex(@"DELETE\s+FROM\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
         // Constraints
-        ["ADD_CONSTRAINT"] = new Regex(@"ADD\s+CONSTRAINT\s+\[?(?<name>\w+)\]?", 
+        ["ADD_CONSTRAINT"] = new Regex(@"ADD\s+CONSTRAINT\s+\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        ["DROP_CONSTRAINT"] = new Regex(@"DROP\s+CONSTRAINT\s+(?:IF\s+EXISTS\s+)?\[?(?<name>\w+)\]?", 
+        ["DROP_CONSTRAINT"] = new Regex(@"DROP\s+CONSTRAINT\s+(?:IF\s+EXISTS\s+)?\[?(?<name>\w+)\]?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
         // Foreign Keys
-        ["FOREIGN_KEY_REFERENCES"] = new Regex(@"REFERENCES\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<table>\w+)\]?\s*\(\s*\[?(?<column>\w+)\]?\s*\)", 
+        ["FOREIGN_KEY_REFERENCES"] = new Regex(@"REFERENCES\s+(?:\[?(?<schema>\w+)\]?\.)?\[?(?<table>\w+)\]?\s*\(\s*\[?(?<column>\w+)\]?\s*\)",
             RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
         // Llamadas a funciones
-        ["FUNCTION_CALL"] = new Regex(@"(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?\s*\(", 
+        ["FUNCTION_CALL"] = new Regex(@"(?:\[?(?<schema>\w+)\]?\.)?\[?(?<name>\w+)\]?\s*\(",
             RegexOptions.IgnoreCase | RegexOptions.Compiled)
     };
     #endregion
@@ -94,7 +94,7 @@ public sealed class ScriptRegexService : IScriptRegexService
         foreach (var (patternName, regex) in SqlObjectPatterns)
         {
             var matches = regex.Matches(cleanScript);
-            
+
             foreach (Match match in matches)
             {
                 var extractedObjects = ExtractObjectsFromMatch(match, patternName);
@@ -176,7 +176,7 @@ public sealed class ScriptRegexService : IScriptRegexService
             "sp_", "fn_", "xp_", "dm_", "INFORMATION_SCHEMA"
         };
 
-        return systemPrefixes.Any(prefix => 
+        return systemPrefixes.Any(prefix =>
             objectName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
     }
     #endregion

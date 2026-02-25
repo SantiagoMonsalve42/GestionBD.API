@@ -1,5 +1,5 @@
-using MediatR;
 using GestionBD.Application.Contracts.Parametros;
+using MediatR;
 
 namespace GestionBD.Application.Parametros.Commands;
 
