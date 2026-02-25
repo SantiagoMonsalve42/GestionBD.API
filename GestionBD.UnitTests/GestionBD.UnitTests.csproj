@@ -13,6 +13,7 @@
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="MediatR" Version="14.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.22" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="xunit" Version="2.5.3" />
@@ -24,13 +25,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Infrastructure\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\GestionBD.API\GestionBD.API.csproj" />
     <ProjectReference Include="..\GestionBD.Domain\GestionBD.Domain.csproj" />
     <ProjectReference Include="..\GestionBD.Infrastructure.ExternalServices\GestionBD.Infrastructure.ExternalServices.csproj" />
+    <ProjectReference Include="..\GestionBD.Infrastructure\GestionBD.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
