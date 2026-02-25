@@ -9,7 +9,7 @@ using GestionBD.Domain.ValueObjects;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace GestionBD.Infraestructure.ExternalServices.OpenAI;
+namespace GestionBD.Infrastructure.ExternalServices.OpenAI;
 
 public sealed class OpenAIRollbackGenerationService : IRollbackGenerationService
 {

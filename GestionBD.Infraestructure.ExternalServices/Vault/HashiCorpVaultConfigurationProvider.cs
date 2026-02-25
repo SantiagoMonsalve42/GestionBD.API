@@ -4,7 +4,7 @@ using VaultSharp;
 using VaultSharp.V1.AuthMethods.Token;
 using VaultSharp.V1.Commons;
 
-namespace GestionBD.Infraestructure.ExternalServices.Vault;
+namespace GestionBD.Infrastructure.ExternalServices.Vault;
 
 /// <summary>
 /// Implementación del proveedor de configuración desde HashiCorp Vault

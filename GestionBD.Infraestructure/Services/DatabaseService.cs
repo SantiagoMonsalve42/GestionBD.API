@@ -3,7 +3,7 @@ using GestionBD.Application.Abstractions.Services;
 using GestionBD.Utils;
 using Microsoft.Data.SqlClient;
 
-namespace GestionBD.Infraestructure.Services;
+namespace GestionBD.Infrastructure.Services;
 
 public sealed class DatabaseService : IDatabaseService
 {

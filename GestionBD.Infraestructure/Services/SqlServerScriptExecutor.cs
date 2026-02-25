@@ -4,7 +4,7 @@ using GestionBD.Utils;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 
-namespace GestionBD.Infraestructure.Services;
+namespace GestionBD.Infrastructure.Services;
 
 public sealed class SqlServerScriptExecutor : IScriptExecutor
 {

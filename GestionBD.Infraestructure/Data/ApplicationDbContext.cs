@@ -1,7 +1,7 @@
 ﻿using GestionBD.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace GestionBD.Infraestructure.Data;
+namespace GestionBD.Infrastructure.Data;
 
 public partial class ApplicationDbContext : DbContext
 {

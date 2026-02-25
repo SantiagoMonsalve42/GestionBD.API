@@ -3,7 +3,7 @@ using GestionBD.Application.Contracts.Entregables;
 using System.IO;
 using System.Text;
 
-namespace GestionBD.Infraestructure.Services;
+namespace GestionBD.Infrastructure.Services;
 
 public sealed class DeployLog : IDeployLog
 {

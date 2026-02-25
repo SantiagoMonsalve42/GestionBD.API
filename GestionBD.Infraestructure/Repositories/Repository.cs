@@ -1,8 +1,8 @@
 ﻿using GestionBD.Application.Abstractions.Repositories.Command;
-using GestionBD.Infraestructure.Data;
+using GestionBD.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace GestionBD.Infraestructure.Repositories;
+namespace GestionBD.Infrastructure.Repositories;
 
 public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
 {

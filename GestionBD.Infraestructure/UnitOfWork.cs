@@ -1,10 +1,10 @@
 ﻿using GestionBD.Domain;
 using GestionBD.Application.Abstractions.Repositories.Command;
-using GestionBD.Infraestructure.Data;
-using GestionBD.Infraestructure.Repositories.Command;
+using GestionBD.Infrastructure.Data;
+using GestionBD.Infrastructure.Repositories.Command;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace GestionBD.Infraestructure;
+namespace GestionBD.Infrastructure;
 
 public sealed class UnitOfWork : IUnitOfWork
 {

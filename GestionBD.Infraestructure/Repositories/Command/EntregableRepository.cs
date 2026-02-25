@@ -1,10 +1,10 @@
 ﻿using GestionBD.Application.Abstractions.Repositories.Command;
 using GestionBD.Domain.Entities;
 using GestionBD.Domain.Enum;
-using GestionBD.Infraestructure.Data;
+using GestionBD.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace GestionBD.Infraestructure.Repositories.Command;
+namespace GestionBD.Infrastructure.Repositories.Command;
 
 public sealed class EntregableRepository : Repository<TblEntregable>, IEntregableRepository
 {

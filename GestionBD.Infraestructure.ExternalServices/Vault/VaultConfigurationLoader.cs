@@ -1,7 +1,7 @@
 using GestionBD.Application.Abstractions.Config;
 using GestionBD.Application.Configuration;
 
-namespace GestionBD.Infraestructure.ExternalServices.Vault;
+namespace GestionBD.Infrastructure.ExternalServices.Vault;
 
 /// <summary>
 /// Cargador de configuraciones desde Vault al inicio de la aplicación

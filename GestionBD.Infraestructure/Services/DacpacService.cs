@@ -5,7 +5,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using Microsoft.SqlServer.Dac;
 
-namespace GestionBD.Infraestructure.Services;
+namespace GestionBD.Infrastructure.Services;
 
 public sealed class DacpacService : IDacpacService
 {

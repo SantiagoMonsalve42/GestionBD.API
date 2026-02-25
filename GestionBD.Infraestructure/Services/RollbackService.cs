@@ -3,7 +3,7 @@ using GestionBD.Domain.ValueObjects;
 using System.IO.Compression;
 using System.Text;
 
-namespace GestionBD.Infraestructure.Services
+namespace GestionBD.Infrastructure.Services
 {
     public class RollbackService : IRollbackService
     {

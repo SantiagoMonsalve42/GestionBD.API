@@ -3,7 +3,7 @@ using GestionBD.Application.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace GestionBD.Infraestructure.Services;
+namespace GestionBD.Infrastructure.Services;
 
 public sealed class LocalFileStorageService : IFileStorageService
 {

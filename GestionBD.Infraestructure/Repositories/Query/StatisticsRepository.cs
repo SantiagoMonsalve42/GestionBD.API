@@ -3,7 +3,7 @@ using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.DTO;
 using System.Data;
 
-namespace GestionBD.Infraestructure.Repositories.Query;
+namespace GestionBD.Infrastructure.Repositories.Query;
 
 internal class StatisticsRepository : IStatisticsRepository
 {

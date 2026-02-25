@@ -1,11 +1,11 @@
 using GestionBD.Application.Abstractions.Config;
 using GestionBD.Domain.Services;
-using GestionBD.Infraestructure.ExternalServices.OpenAI;
-using GestionBD.Infraestructure.ExternalServices.Vault;
+using GestionBD.Infrastructure.ExternalServices.OpenAI;
+using GestionBD.Infrastructure.ExternalServices.Vault;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GestionBD.Infraestructure.ExternalServices;
+namespace GestionBD.Infrastructure.ExternalServices;
 
 public static class DependencyInjection
 {

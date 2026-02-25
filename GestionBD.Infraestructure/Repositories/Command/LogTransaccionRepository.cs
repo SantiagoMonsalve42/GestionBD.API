@@ -1,8 +1,8 @@
 ﻿using GestionBD.Application.Abstractions.Repositories.Command;
 using GestionBD.Domain.Entities;
-using GestionBD.Infraestructure.Data;
+using GestionBD.Infrastructure.Data;
 
-namespace GestionBD.Infraestructure.Repositories.Command;
+namespace GestionBD.Infrastructure.Repositories.Command;
 
 public sealed class LogTransaccionRepository : Repository<TblLogTransaccione>, ILogTransaccionRepository
 {

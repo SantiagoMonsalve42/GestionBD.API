@@ -2,9 +2,9 @@ using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Abstractions.Services;
 using GestionBD.Application.Configuration;
 using GestionBD.Domain;
-using GestionBD.Infraestructure.Data;
-using GestionBD.Infraestructure.Repositories.Query;
-using GestionBD.Infraestructure.Services;
+using GestionBD.Infrastructure.Data;
+using GestionBD.Infrastructure.Repositories.Query;
+using GestionBD.Infrastructure.Services;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Data;
 
-namespace GestionBD.Infraestructure;
+namespace GestionBD.Infrastructure;
 
 public static class DependencyInjection
 {

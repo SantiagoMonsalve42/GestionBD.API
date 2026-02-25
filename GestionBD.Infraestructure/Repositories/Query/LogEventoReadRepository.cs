@@ -3,7 +3,7 @@ using Dapper;
 using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Contracts.LogEventos;
 
-namespace GestionBD.Infraestructure.Repositories.Query;
+namespace GestionBD.Infrastructure.Repositories.Query;
 
 public sealed class LogEventoReadRepository : ILogEventoReadRepository
 {
