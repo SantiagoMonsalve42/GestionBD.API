@@ -38,7 +38,7 @@ public sealed class CreateEntregableWithFileCommandHandler : IRequestHandler<Cre
         {
             int cantidadEntregas = await _entregableReadRepository.GetEntregablesByEjecucion(command.Request.IdEjecucion) + 1;
             var ejecucion = await _ejecucionReadRepository.GetByIdAsync(command.Request.IdEjecucion, cancellationToken);
-            
+
             if (ejecucion == null)
             {
                 throw new ValidationException("IdEjecucion", "La ejecución no existe");
@@ -46,18 +46,18 @@ public sealed class CreateEntregableWithFileCommandHandler : IRequestHandler<Cre
             var entregableExistente = await _entregableReadRepository.GetAllByIdEjecucionAsync(
                 command.Request.IdEjecucion,
                 cancellationToken);
-            
 
-            if (entregableExistente.Any(x=> x.EstadoEntregaId != (int)EstadoEntregaEnum.Cerrado))
+
+            if (entregableExistente.Any(x => x.EstadoEntregaId != (int)EstadoEntregaEnum.Cerrado))
             {
 
                 throw new ValidationException("EntregableExistente", "Ya existe un entregable abierto, primero cierrelo antes de crear otro.");
             }
 
             var archivoEntregable = ArchivoEntregable.Crear(
-                file.FileName, 
-                file.Length, 
-                ejecucion.NombreRequerimiento, 
+                file.FileName,
+                file.Length,
+                ejecucion.NombreRequerimiento,
                 cantidadEntregas);
 
             using var stream = file.OpenReadStream();
@@ -85,8 +85,8 @@ public sealed class CreateEntregableWithFileCommandHandler : IRequestHandler<Cre
                 _unitOfWork.Entregables.Add(entregable);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
                 var artefactos = ArchivoEntregable.ObtenerArtefactos(
-                    stream, 
-                    entregable.IdEntregable, 
+                    stream,
+                    entregable.IdEntregable,
                     rutaEntregable);
 
                 foreach (var artefacto in artefactos)
@@ -107,7 +107,7 @@ public sealed class CreateEntregableWithFileCommandHandler : IRequestHandler<Cre
                 {
                     await _fileStorageService.DeleteFileAsync(rutaEntregable, cancellationToken);
                 }
-                throw; 
+                throw;
             }
         }
         catch (ValidationException)

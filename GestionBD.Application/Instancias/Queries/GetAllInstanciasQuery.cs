@@ -1,5 +1,5 @@
-using MediatR;
 using GestionBD.Application.Contracts.Instancias;
+using MediatR;
 
 namespace GestionBD.Application.Instancias.Queries;
 

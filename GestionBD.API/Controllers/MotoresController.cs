@@ -54,7 +54,7 @@ public sealed class MotoresController : ControllerBase
     public async Task<IActionResult> GetById(decimal id)
     {
         var motor = await _mediator.Send(new GetMotorByIdQuery(id));
-        
+
         if (motor == null)
             return NotFound(new { message = $"Motor con ID {id} no encontrado." });
 

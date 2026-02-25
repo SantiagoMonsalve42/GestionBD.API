@@ -1,5 +1,4 @@
-﻿using GestionBD.Application.Contracts.Entregables;
-using MediatR;
+﻿using MediatR;
 
 namespace GestionBD.Application.Entregables.Commands;
 

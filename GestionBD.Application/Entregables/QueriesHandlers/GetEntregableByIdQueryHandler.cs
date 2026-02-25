@@ -1,7 +1,7 @@
-using MediatR;
-using GestionBD.Application.Contracts.Entregables;
 using GestionBD.Application.Abstractions.Repositories.Query;
+using GestionBD.Application.Contracts.Entregables;
 using GestionBD.Application.Entregables.Queries;
+using MediatR;
 
 namespace GestionBD.Application.Entregables.QueriesHandlers;
 

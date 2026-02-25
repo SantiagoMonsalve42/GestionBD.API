@@ -10,37 +10,37 @@ using System.Text;
 
 namespace GestionBD.Application.Artefactos.CommandsHandlers;
 
-public sealed class ValidateArtefactoCommandHandler 
+public sealed class ValidateArtefactoCommandHandler
     : IRequestHandler<ValidateArtefactoCommand, IEnumerable<ValidateArtefactoResponse>>
 {
-    private readonly IEntregableReadRepository _entregableReadRepository; 
+    private readonly IEntregableReadRepository _entregableReadRepository;
     private readonly IArtefactoReadRepository _artefactoReadRepository;
     private readonly ISqlValidationService _sqlValidationService;
     private readonly IUnitOfWork _unitOfWork;
     private const int MaxConcurrentValidations = 5; // Limitar a 5 validaciones simultáneas
 
     public ValidateArtefactoCommandHandler(
-        IEntregableReadRepository entregableReadRepository, 
+        IEntregableReadRepository entregableReadRepository,
         IArtefactoReadRepository artefactoReadRepository,
         ISqlValidationService sqlValidationService,
         IUnitOfWork unitOfWork)
     {
-        _entregableReadRepository = entregableReadRepository 
+        _entregableReadRepository = entregableReadRepository
             ?? throw new ArgumentNullException(nameof(entregableReadRepository));
-        _artefactoReadRepository = artefactoReadRepository 
+        _artefactoReadRepository = artefactoReadRepository
             ?? throw new ArgumentNullException(nameof(artefactoReadRepository));
-        _sqlValidationService = sqlValidationService 
+        _sqlValidationService = sqlValidationService
             ?? throw new ArgumentNullException(nameof(sqlValidationService));
-        _unitOfWork = unitOfWork 
+        _unitOfWork = unitOfWork
             ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public async Task<IEnumerable<ValidateArtefactoResponse>> Handle(
-        ValidateArtefactoCommand request, 
+        ValidateArtefactoCommand request,
         CancellationToken cancellationToken)
     {
         var entregable = await _entregableReadRepository.GetByIdAsync(
-            request.idEntregable, 
+            request.idEntregable,
             cancellationToken);
 
         if (entregable == null)
@@ -48,7 +48,7 @@ public sealed class ValidateArtefactoCommandHandler
                 $"No se encontró el entregable con ID {request.idEntregable}");
 
         var artefactos = await _artefactoReadRepository.GetByEntregableIdAsync(
-            request.idEntregable, 
+            request.idEntregable,
             cancellationToken);
 
         var artefactosEntidades = artefactos.Select(a => new Domain.Entities.TblArtefacto
@@ -63,14 +63,14 @@ public sealed class ValidateArtefactoCommandHandler
         }).ToList();
 
         var scripts = ScriptDeployment.ExtractScriptsFromZip(
-            entregable.RutaEntregable, 
+            entregable.RutaEntregable,
             artefactosEntidades);
 
         var results = await ValidateScriptsWithThrottlingAsync(scripts, cancellationToken);
         var secuencialResult = await ValidateSecuencialExecution(scripts, cancellationToken);
         if (secuencialResult != null)
-            results=results.Append(secuencialResult);
-        await _unitOfWork.Entregables.UpdateEstado(request.idEntregable,Domain.Enum.EstadoEntregaEnum.Analisis, cancellationToken);
+            results = results.Append(secuencialResult);
+        await _unitOfWork.Entregables.UpdateEstado(request.idEntregable, Domain.Enum.EstadoEntregaEnum.Analisis, cancellationToken);
         await _unitOfWork.CommitTransactionAsync();
         return results;
     }
@@ -106,9 +106,9 @@ public sealed class ValidateArtefactoCommandHandler
             {
                 var validation = await _sqlValidationService.ValidateScriptAsync(
                     false,
-                    script.ScriptContent, 
+                    script.ScriptContent,
                     cancellationToken);
-                
+
                 results.Add(new ValidateArtefactoResponse(script.ScriptName, validation));
             }
             finally

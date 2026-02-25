@@ -5,7 +5,7 @@ namespace GestionBD.Application.Contracts.Ejecuciones;
 public sealed record CreateEjecucionRequest(
     [Required]
     decimal IdInstancia,
-    
+
     [MaxLength(150, ErrorMessage = "La descripción no puede exceder 150 caracteres")]
     string? Descripcion,
 

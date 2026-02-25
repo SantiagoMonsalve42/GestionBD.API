@@ -1,8 +1,8 @@
 using GestionBD.API.Configuration;
 using GestionBD.API.Extensions;
 using GestionBD.Application;
-using GestionBD.Infraestructure;
-using GestionBD.Infraestructure.ExternalServices;
+using GestionBD.Infrastructure;
+using GestionBD.Infrastructure.ExternalServices;
 
 var builder = WebApplication.CreateBuilder(args);
 

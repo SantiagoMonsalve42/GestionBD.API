@@ -81,7 +81,7 @@ public sealed class EntregablesController : ControllerBase
     public async Task<IActionResult> GetById(decimal id)
     {
         var entregable = await _mediator.Send(new GetEntregableByIdQuery(id));
-        
+
         if (entregable == null)
             return NotFound(new { message = $"Entregable con ID {id} no encontrado." });
 
@@ -132,5 +132,5 @@ public sealed class EntregablesController : ControllerBase
             return NotFound(new { message = ex.Message });
         }
     }
-    
+
 }

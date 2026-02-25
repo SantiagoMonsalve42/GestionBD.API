@@ -20,7 +20,7 @@ public sealed record ArchivoEntregable
         FileSize = fileSize;
         Extension = Path.GetExtension(fileName).ToLowerInvariant();
     }
-    
+
     public static ArchivoEntregable Crear(string fileName, long fileSize, string reqName, int deliveryCount)
     {
         if (string.IsNullOrWhiteSpace(fileName))
@@ -36,7 +36,7 @@ public sealed record ArchivoEntregable
         if (fileSize > MaxFileSize)
         {
             throw new ValidationException(
-                "FileSize", 
+                "FileSize",
                 $"El archivo excede el tamaño máximo permitido de {MaxFileSize / (1024 * 1024)} MB");
         }
 
@@ -44,7 +44,7 @@ public sealed record ArchivoEntregable
         if (!AllowedExtensions.Contains(extension))
         {
             throw new ValidationException(
-                "FileName", 
+                "FileName",
                 $"Solo se permiten archivos con extensiones: {string.Join(", ", AllowedExtensions)}");
         }
 
@@ -135,7 +135,7 @@ public sealed record ArchivoEntregable
             using var archive = new ZipArchive(zipStream, ZipArchiveMode.Read, leaveOpen: true);
 
             var sqlEntries = archive.Entries
-                .Where(e => !string.IsNullOrWhiteSpace(e.Name) && 
+                .Where(e => !string.IsNullOrWhiteSpace(e.Name) &&
                            Path.GetExtension(e.Name).Equals(".sql", StringComparison.OrdinalIgnoreCase))
                 .OrderBy(e => e.FullName) // Ordenar alfabéticamente
                 .ToList();
@@ -150,7 +150,7 @@ public sealed record ArchivoEntregable
             foreach (var entry in sqlEntries)
             {
                 var nombreArtefacto = Path.GetFileNameWithoutExtension(entry.Name);
-                var rutaRelativa = entry.FullName.Replace('/', '\\'); 
+                var rutaRelativa = entry.FullName.Replace('/', '\\');
 
                 var codificacion = DeterminarCodificacion(nombreArtefacto);
 

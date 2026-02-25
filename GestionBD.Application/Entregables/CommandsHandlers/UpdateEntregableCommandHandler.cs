@@ -1,7 +1,7 @@
-using MediatR;
+using GestionBD.Application.Entregables.Commands;
 using GestionBD.Domain;
 using GestionBD.Domain.Entities;
-using GestionBD.Application.Entregables.Commands;
+using MediatR;
 
 namespace GestionBD.Application.Entregables.CommandsHandlers;
 

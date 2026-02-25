@@ -1,5 +1,5 @@
-using MediatR;
 using GestionBD.Application.Contracts.Artefactos;
+using MediatR;
 
 namespace GestionBD.Application.Artefactos.Queries;
 
