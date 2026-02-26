@@ -6,7 +6,7 @@ public class ConflictException : DomainException
     {
     }
 
-    public ConflictException(string message, Exception innerException) 
+    public ConflictException(string message, Exception innerException)
         : base(message, innerException)
     {
     }

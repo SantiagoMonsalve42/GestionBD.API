@@ -6,7 +6,6 @@ using GestionBD.Application.Services;
 using GestionBD.Domain;
 using GestionBD.Domain.Exceptions;
 using MediatR;
-using System.Collections.Generic;
 
 namespace GestionBD.Application.Entregables.CommandsHandlers
 {
@@ -32,10 +31,10 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
         {
             try
             {
-                IEnumerable <EntregablePreValidateResponse> resultado = await _deploymentService.DeployAsync(request.idEntregable, cancellationToken);
+                IEnumerable<EntregablePreValidateResponse> resultado = await _deploymentService.DeployAsync(request.idEntregable, cancellationToken);
                 var entrable = await _entregableReadRepository.GetByIdAsync(request.idEntregable, cancellationToken);
                 string logFileName = $"Despliegue_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
-                string pathResult = await _deployLog.GenerarArchivoLog(resultado,entrable.RutaEntregable, logFileName);
+                string pathResult = await _deployLog.GenerarArchivoLog(resultado, entrable.RutaEntregable, logFileName);
                 await _unitOfWork.Entregables.UpdateRutaResultado(request.idEntregable, pathResult);
                 await _unitOfWork.CommitTransactionAsync();
                 return $"Resultado del despliegue almacenado en la ruta {pathResult}.";

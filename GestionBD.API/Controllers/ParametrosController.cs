@@ -54,7 +54,7 @@ public sealed class ParametrosController : ControllerBase
     public async Task<IActionResult> GetById(decimal id)
     {
         var parametro = await _mediator.Send(new GetParametroByIdQuery(id));
-        
+
         if (parametro == null)
             return NotFound(new { message = $"Parámetro con ID {id} no encontrado." });
 

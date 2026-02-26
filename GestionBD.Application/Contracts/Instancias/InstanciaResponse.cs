@@ -5,6 +5,5 @@ public sealed record InstanciaResponse(
     decimal IdMotor,
     string Instancia,
     int Puerto,
-    string Usuario,
     string NombreBD
 );

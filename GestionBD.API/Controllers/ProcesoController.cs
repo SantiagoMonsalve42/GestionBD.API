@@ -67,9 +67,9 @@ public sealed class ProcesoController : ControllerBase
 
     [HttpPost("seventh-step/{idEntregable:decimal}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> SentToCerrado(decimal idEntregable,[FromQuery] int close)
+    public async Task<IActionResult> SentToCerrado(decimal idEntregable, [FromQuery] int close)
     {
-        var isValid = await _mediator.Send(new EntregableToCerradoCommand(idEntregable,close));
+        var isValid = await _mediator.Send(new EntregableToCerradoCommand(idEntregable, close));
         return NoContent();
     }
 }

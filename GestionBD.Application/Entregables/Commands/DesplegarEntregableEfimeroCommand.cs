@@ -3,4 +3,4 @@ using MediatR;
 
 namespace GestionBD.Application.Entregables.Commands;
 
-public sealed record DesplegarEntregableEfimeroCommand(decimal idEntregable ) : IRequest<IEnumerable<EntregablePreValidateResponse>>;
+public sealed record DesplegarEntregableEfimeroCommand(decimal idEntregable) : IRequest<IEnumerable<EntregablePreValidateResponse>>;

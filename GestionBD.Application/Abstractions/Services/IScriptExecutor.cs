@@ -6,8 +6,8 @@ namespace GestionBD.Application.Abstractions.Services
     public interface IScriptExecutor
     {
         Task ExecuteAsync(
-            string databaseName, 
-            string scriptBatch, 
+            string databaseName,
+            string scriptBatch,
             string? serverName = null,
             string? username = null,
             string? password = null,

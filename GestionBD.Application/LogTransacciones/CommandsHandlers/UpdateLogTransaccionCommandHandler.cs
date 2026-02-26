@@ -1,7 +1,7 @@
-using MediatR;
+using GestionBD.Application.LogTransacciones.Commands;
 using GestionBD.Domain;
 using GestionBD.Domain.Entities;
-using GestionBD.Application.LogTransacciones.Commands;
+using MediatR;
 
 namespace GestionBD.Application.LogTransacciones.CommandsHandlers;
 

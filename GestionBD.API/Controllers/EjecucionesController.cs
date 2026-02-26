@@ -54,7 +54,7 @@ public sealed class EjecucionesController : ControllerBase
     public async Task<IActionResult> GetById(decimal id)
     {
         var ejecucion = await _mediator.Send(new GetEjecucionByIdQuery(id));
-        
+
         if (ejecucion == null)
             return NotFound(new { message = $"Ejecución con ID {id} no encontrada." });
 

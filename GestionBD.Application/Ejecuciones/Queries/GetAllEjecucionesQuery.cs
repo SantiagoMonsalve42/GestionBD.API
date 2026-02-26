@@ -1,5 +1,5 @@
-using MediatR;
 using GestionBD.Application.Contracts.Ejecuciones;
+using MediatR;
 
 namespace GestionBD.Application.Ejecuciones.Queries;
 

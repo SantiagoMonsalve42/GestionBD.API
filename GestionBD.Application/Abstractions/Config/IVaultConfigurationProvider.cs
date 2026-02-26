@@ -9,9 +9,14 @@ public interface IVaultConfigurationProvider
     /// Obtiene configuración desde una ruta específica y la deserializa al tipo T
     /// </summary>
     Task<T> GetConfigurationAsync<T>(string path, CancellationToken cancellationToken = default) where T : class, new();
-    
+
     /// <summary>
     /// Obtiene todos los datos de una ruta como diccionario
     /// </summary>
     Task<IDictionary<string, object>> GetSecretsAsync(string path, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Crea o sobreescribe secretos en una ruta
+    /// </summary>
+    Task SetSecretsAsync(string path, object secrets, CancellationToken cancellationToken = default);
 }

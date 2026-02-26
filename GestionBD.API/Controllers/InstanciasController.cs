@@ -54,7 +54,7 @@ public sealed class InstanciasController : ControllerBase
     public async Task<IActionResult> GetById(decimal id)
     {
         var instancia = await _mediator.Send(new GetInstanciaByIdQuery(id));
-        
+
         if (instancia == null)
             return NotFound(new { message = $"Instancia con ID {id} no encontrada." });
 

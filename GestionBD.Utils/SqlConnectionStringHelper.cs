@@ -17,15 +17,15 @@ public static class SqlConnectionStringHelper
     /// <param name="options">Opciones adicionales de conexión</param>
     /// <returns>Connection string configurado</returns>
     public static string BuildConnectionString(
-        string serverName, 
-        string databaseName, 
-        string? username = null, 
+        string serverName,
+        string databaseName,
+        string? username = null,
         string? password = null,
         SqlConnectionOptions? options = null)
     {
         if (string.IsNullOrWhiteSpace(serverName))
             throw new ArgumentException("El nombre del servidor no puede estar vacío", nameof(serverName));
-        
+
         if (string.IsNullOrWhiteSpace(databaseName))
             throw new ArgumentException("El nombre de la base de datos no puede estar vacío", nameof(databaseName));
 
@@ -69,8 +69,8 @@ public static class SqlConnectionStringHelper
     /// <param name="options">Opciones adicionales de conexión</param>
     /// <returns>Connection string con autenticación de Windows</returns>
     public static string BuildWindowsAuthConnectionString(
-        string serverName, 
-        string databaseName, 
+        string serverName,
+        string databaseName,
         SqlConnectionOptions? options = null)
     {
         return BuildConnectionString(serverName, databaseName, null, null, options);
@@ -86,15 +86,15 @@ public static class SqlConnectionStringHelper
     /// <param name="options">Opciones adicionales de conexión</param>
     /// <returns>Connection string con autenticación SQL Server</returns>
     public static string BuildSqlAuthConnectionString(
-        string serverName, 
-        string databaseName, 
-        string username, 
-        string password, 
+        string serverName,
+        string databaseName,
+        string username,
+        string password,
         SqlConnectionOptions? options = null)
     {
         if (string.IsNullOrWhiteSpace(username))
             throw new ArgumentException("El usuario no puede estar vacío para autenticación SQL", nameof(username));
-        
+
         if (string.IsNullOrWhiteSpace(password))
             throw new ArgumentException("La contraseña no puede estar vacía para autenticación SQL", nameof(password));
 

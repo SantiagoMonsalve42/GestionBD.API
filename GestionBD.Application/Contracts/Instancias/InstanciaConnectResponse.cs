@@ -2,8 +2,7 @@ namespace GestionBD.Application.Contracts.Instancias;
 
 public sealed record InstanciaConnectResponse(
     string Instancia,
-    string Usuario,
-    string Password,
+    string SessionPath,
     int Puerto,
     string NombreBD,
     string? TemporalBD

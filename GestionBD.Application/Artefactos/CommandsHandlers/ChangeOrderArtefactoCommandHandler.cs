@@ -1,5 +1,4 @@
-﻿using GestionBD.Application.Abstractions.Repositories.Command;
-using GestionBD.Application.Artefactos.Commands;
+﻿using GestionBD.Application.Artefactos.Commands;
 using GestionBD.Domain;
 using MediatR;
 

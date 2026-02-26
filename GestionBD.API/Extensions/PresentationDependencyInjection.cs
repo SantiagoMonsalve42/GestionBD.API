@@ -33,7 +33,7 @@ public static class PresentationDependencyInjection
 
         services.AddControllers();
         services.AddEndpointsApiExplorer();
-        
+
         services.AddSwaggerGen(options =>
         {
             options.SwaggerDoc("v1", new OpenApiInfo
