@@ -18,7 +18,6 @@ public sealed class ArtefactosController : ControllerBase
     {
         _mediator = mediator;
     }
-
     /// <summary>
     /// Crea un nuevo artefacto
     /// </summary>

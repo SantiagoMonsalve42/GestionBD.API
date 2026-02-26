@@ -1,3 +1,4 @@
+using GestionBD.Application.Abstractions.Config;
 using GestionBD.Application.Abstractions.Repositories.Command;
 using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Abstractions.Services;
@@ -20,7 +21,7 @@ public sealed class EntregableEfimeroCommandHandlerTests
         var instanciaReadRepositoryMock = new Mock<IInstanciaReadRepository>();
         instanciaReadRepositoryMock
             .Setup(x => x.GetConnectionDetailsByEntregableIdAsync(entregableId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new InstanciaConnectResponse("srv", "usr", "pwd", 1433, "db", "tempdb"));
+            .ReturnsAsync(new InstanciaConnectResponse("srv", "usr", 1433, "db", "tempdb"));
 
         var dacpacServiceMock = new Mock<IDacpacService>();
         dacpacServiceMock
@@ -39,12 +40,21 @@ public sealed class EntregableEfimeroCommandHandlerTests
             .ReturnsAsync(true);
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
+        var keyVaultProvider = new Mock<IVaultConfigurationProvider>();
+        keyVaultProvider
+                .Setup(x => x.GetSecretsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Dictionary<string, object>
+                {
+                    ["user"] = "usr",
+                    ["pass"] = "pwd"
+                });
         unitOfWorkMock.SetupGet(x => x.Entregables).Returns(entregableRepositoryMock.Object);
 
         var handler = new EntregableEfimeroCommandHandler(
             unitOfWorkMock.Object,
             instanciaReadRepositoryMock.Object,
-            dacpacServiceMock.Object);
+            dacpacServiceMock.Object,
+            keyVaultProvider.Object);
 
         var result = await handler.Handle(new EntregableEfimeroCommand(entregableId), CancellationToken.None);
 
@@ -62,11 +72,12 @@ public sealed class EntregableEfimeroCommandHandlerTests
             .ReturnsAsync((InstanciaConnectResponse?)null);
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
-
+        var keyVaultProvider = new Mock<IVaultConfigurationProvider>();
         var handler = new EntregableEfimeroCommandHandler(
             unitOfWorkMock.Object,
             instanciaReadRepositoryMock.Object,
-            Mock.Of<IDacpacService>());
+            Mock.Of<IDacpacService>(),
+            keyVaultProvider.Object);
 
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
             handler.Handle(new EntregableEfimeroCommand(1m), CancellationToken.None));
