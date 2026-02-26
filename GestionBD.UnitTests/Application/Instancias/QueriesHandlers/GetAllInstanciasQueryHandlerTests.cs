@@ -11,7 +11,7 @@ public sealed class GetAllInstanciasQueryHandlerTests
     [Fact]
     public async Task Handle_RepositoryReturnsItems_ReturnsItems()
     {
-        var expected = new[] { new InstanciaResponse(1m, 1m, "srv", 1433, "usr", "db") };
+        var expected = new[] { new InstanciaResponse(1m, 1m, "srv", 1433, "db") };
 
         var repositoryMock = new Mock<IInstanciaReadRepository>();
         repositoryMock
