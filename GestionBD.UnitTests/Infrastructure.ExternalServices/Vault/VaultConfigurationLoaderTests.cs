@@ -65,5 +65,10 @@ public sealed class VaultConfigurationLoaderTests
         {
             return Task.FromResult<IDictionary<string, object>>(new Dictionary<string, object>());
         }
+
+        public Task SetSecretsAsync(string path, object secrets, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

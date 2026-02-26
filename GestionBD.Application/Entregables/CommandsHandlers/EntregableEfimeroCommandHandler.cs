@@ -1,4 +1,5 @@
-﻿using GestionBD.Application.Abstractions.Repositories.Query;
+﻿using GestionBD.Application.Abstractions.Config;
+using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Abstractions.Services;
 using GestionBD.Application.Entregables.Commands;
 using GestionBD.Domain;
@@ -11,14 +12,17 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IInstanciaReadRepository _instanciaReadRepository;
         private readonly IDacpacService _dacpacService;
+        private readonly IVaultConfigurationProvider _vaultConfigurationProvider;
 
         public EntregableEfimeroCommandHandler(IUnitOfWork unitOfWork,
                                                 IInstanciaReadRepository instanciaReadRepository,
-                                                IDacpacService dacpacService)
+                                                IDacpacService dacpacService,
+                                                IVaultConfigurationProvider vaultConfigurationProvider)
         {
             _unitOfWork = unitOfWork;
             _instanciaReadRepository = instanciaReadRepository;
             _dacpacService = dacpacService;
+            _vaultConfigurationProvider = vaultConfigurationProvider;
         }
 
         public async Task<string> Handle(EntregableEfimeroCommand request, CancellationToken cancellationToken)
@@ -33,13 +37,13 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
 
                 if (!string.IsNullOrEmpty(entregable.TemporalBD))
                     await _dacpacService.DropTemporaryDatabaseAsync(entregable.TemporalBD);
-
+                var vaultPath = await _vaultConfigurationProvider.GetSecretsAsync(entregable.SessionPath);
 
                 var dacpacPath = await _dacpacService.ExtractDacpacAsync(
                     serverName: $"{entregable.Instancia},{entregable.Puerto}",
                     databaseName: entregable.NombreBD,
-                    username: entregable.Usuario,
-                    password: entregable.Password,
+                    username: vaultPath["user"].ToString(),
+                    password: vaultPath["pass"].ToString(),
                     cancellationToken: cancellationToken
                 );
 

@@ -1,3 +1,4 @@
+using GestionBD.Application.Abstractions.Config;
 using GestionBD.Application.Abstractions.Repositories.Command;
 using GestionBD.Application.Contracts.Instancias;
 using GestionBD.Application.Instancias.Commands;
@@ -16,6 +17,7 @@ public sealed class UpdateInstanciaCommandHandlerTests
         var instancia = new TblInstancia { IdInstancia = 1m };
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
+        var vaultConfigurationProviderMock = new Mock<IVaultConfigurationProvider>();
         unitOfWorkMock
             .Setup(x => x.FindEntityAsync<TblInstancia>(1m, It.IsAny<CancellationToken>()))
             .ReturnsAsync(instancia);
@@ -23,7 +25,7 @@ public sealed class UpdateInstanciaCommandHandlerTests
         var instanciaRepositoryMock = new Mock<IInstanciaRepository>();
         unitOfWorkMock.SetupGet(x => x.Instancias).Returns(instanciaRepositoryMock.Object);
 
-        var handler = new UpdateInstanciaCommandHandler(unitOfWorkMock.Object);
+        var handler = new UpdateInstanciaCommandHandler(unitOfWorkMock.Object, vaultConfigurationProviderMock.Object);
 
         var request = new UpdateInstanciaRequest(1m, 2m, "srv", 1433, "usr", "pwd", "db");
         await handler.Handle(new UpdateInstanciaCommand(request), CancellationToken.None);
@@ -41,7 +43,8 @@ public sealed class UpdateInstanciaCommandHandlerTests
             .Setup(x => x.FindEntityAsync<TblInstancia>(It.IsAny<decimal>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((TblInstancia?)null);
 
-        var handler = new UpdateInstanciaCommandHandler(unitOfWorkMock.Object);
+        var vaultConfigurationProviderMock = new Mock<IVaultConfigurationProvider>();
+        var handler = new UpdateInstanciaCommandHandler(unitOfWorkMock.Object, vaultConfigurationProviderMock.Object);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() =>
             handler.Handle(new UpdateInstanciaCommand(new UpdateInstanciaRequest(1m, 2m, "srv", 1433, "usr", "pwd", "db")), CancellationToken.None));
