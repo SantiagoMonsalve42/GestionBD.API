@@ -31,7 +31,6 @@ public sealed class HashiCorpVaultConfigurationProvider : IVaultConfigurationPro
     {
         var secrets = await GetSecretsAsync(path, cancellationToken);
 
-        // Convertir el diccionario a JSON y luego deserializar al tipo T
         var json = JsonSerializer.Serialize(secrets);
         var result = JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions
         {
@@ -48,7 +47,6 @@ public sealed class HashiCorpVaultConfigurationProvider : IVaultConfigurationPro
 
         try
         {
-            // Leer secreto desde Vault (KV v2)
             Secret<SecretData> secret = await _vaultClient.V1.Secrets.KeyValue.V2
                 .ReadSecretAsync(path: path, mountPoint: "secret");
 
@@ -64,5 +62,37 @@ public sealed class HashiCorpVaultConfigurationProvider : IVaultConfigurationPro
             throw new InvalidOperationException(
                 $"Error al obtener configuración de Vault. Ruta: '{path}'", ex);
         }
+    }
+
+    public async Task SetSecretsAsync(string path, object secrets, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            throw new ArgumentException("La ruta no puede estar vacía", nameof(path));
+
+        if (secrets == null)
+            throw new ArgumentNullException(nameof(secrets));
+
+        var data = ToDictionary(secrets);
+
+        if (data.Count == 0)
+            throw new ArgumentException("El objeto de secretos no puede estar vacío", nameof(secrets));
+
+        try
+        {
+            await _vaultClient.V1.Secrets.KeyValue.V2
+                .WriteSecretAsync(path: path, data: data, mountPoint: "secret");
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                $"Error al guardar configuración en Vault. Ruta: '{path}'", ex);
+        }
+    }
+
+    private static Dictionary<string, object> ToDictionary(object secrets)
+    {
+        var json = JsonSerializer.Serialize(secrets);
+        return JsonSerializer.Deserialize<Dictionary<string, object>>(json)
+               ?? new Dictionary<string, object>();
     }
 }

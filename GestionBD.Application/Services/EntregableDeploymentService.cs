@@ -1,3 +1,4 @@
+using GestionBD.Application.Abstractions.Config;
 using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Abstractions.Services;
 using GestionBD.Application.Contracts.Entregables;
@@ -15,6 +16,7 @@ namespace GestionBD.Application.Services
         private readonly IDacpacService _dacpacService;
         private readonly IInstanciaReadRepository _instanciaReadRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IVaultConfigurationProvider _vaultConfigurationProvider;
 
         public EntregableDeploymentService(
             IEntregableReadRepository entregableReadRepository,
@@ -22,7 +24,8 @@ namespace GestionBD.Application.Services
             IScriptExecutor scriptExecutor,
             IDacpacService dacpacService,
             IInstanciaReadRepository instanciaReadRepository,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IVaultConfigurationProvider vaultConfigurationProvider)
         {
             _entregableReadRepository = entregableReadRepository;
             _artefactoReadRepository = artefactoReadRepository;
@@ -30,6 +33,7 @@ namespace GestionBD.Application.Services
             _dacpacService = dacpacService;
             _instanciaReadRepository = instanciaReadRepository;
             _unitOfWork = unitOfWork;
+            _vaultConfigurationProvider = vaultConfigurationProvider;
         }
 
         public async Task<IEnumerable<EntregablePreValidateResponse>> PreDeployAsync(
@@ -114,7 +118,8 @@ namespace GestionBD.Application.Services
 
                 if (datosInstancia == null)
                     throw new InvalidOperationException($"No se encontró conexion parametrizada con ID {idEntregable}");
-
+                
+                var vaultPath = await _vaultConfigurationProvider.GetSecretsAsync(datosInstancia.SessionPath);
                 // 2. Obtener los artefactos
                 var artefactos = await _artefactoReadRepository.GetByEntregableIdAsync(idEntregable, cancellationToken);
 
@@ -141,8 +146,8 @@ namespace GestionBD.Application.Services
                     var result = await ExecuteScriptAsync(script,
                                                           datosInstancia.NombreBD,
                                                           $"{datosInstancia.Instancia},{datosInstancia.Puerto}",
-                                                          datosInstancia.Usuario,
-                                                          datosInstancia.Password,
+                                                          vaultPath["user"].ToString() ?? "",
+                                                          vaultPath["pass"].ToString() ?? "",
                                                           cancellationToken);
                     results.Add(result);
                 }

@@ -22,7 +22,6 @@ public sealed class InstanciaReadRepository : IInstanciaReadRepository
                 i.idMotor AS IdMotor,
                 i.instancia AS Instancia,
                 i.puerto AS Puerto,
-                i.usuario AS Usuario,
                 i.nombreBD AS NombreBD
             FROM dbo.tbl_Instancias i
             ORDER BY i.instancia;
@@ -39,7 +38,6 @@ public sealed class InstanciaReadRepository : IInstanciaReadRepository
                 i.idMotor AS IdMotor,
                 i.instancia AS Instancia,
                 i.puerto AS Puerto,
-                i.usuario AS Usuario,
                 i.nombreBD AS NombreBD
             FROM dbo.tbl_Instancias i
             WHERE i.idInstancia = @Id;
@@ -53,8 +51,7 @@ public sealed class InstanciaReadRepository : IInstanciaReadRepository
         const string sql = """
             select 
             	i.instancia AS Instancia,
-            	i.usuario AS Usuario,
-            	i.password AS Password,
+            	i.sessionPath AS SessionPath,
             	i.puerto AS Puerto,
             	i.nombreBD AS NombreBD,
                 en.temporalBD AS TemporalBD

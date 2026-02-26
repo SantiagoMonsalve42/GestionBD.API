@@ -14,4 +14,9 @@ public interface IVaultConfigurationProvider
     /// Obtiene todos los datos de una ruta como diccionario
     /// </summary>
     Task<IDictionary<string, object>> GetSecretsAsync(string path, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Crea o sobreescribe secretos en una ruta
+    /// </summary>
+    Task SetSecretsAsync(string path, object secrets, CancellationToken cancellationToken = default);
 }

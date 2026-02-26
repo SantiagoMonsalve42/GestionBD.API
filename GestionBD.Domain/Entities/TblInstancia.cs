@@ -6,9 +6,7 @@ public partial class TblInstancia
 
     public string Instancia { get; set; } = null!;
 
-    public string Usuario { get; set; } = null!;
-
-    public string Password { get; set; } = null!;
+    public string? SessionPath { get; set; }
 
     public decimal IdMotor { get; set; }
 

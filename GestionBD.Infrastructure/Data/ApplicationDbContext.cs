@@ -163,15 +163,11 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(150)
                 .IsUnicode(false)
                 .HasColumnName("instancia");
-            entity.Property(e => e.Password)
-                .HasMaxLength(150)
+            entity.Property(e => e.SessionPath)
+                .HasMaxLength(1500)
                 .IsUnicode(false)
-                .HasColumnName("password");
+                .HasColumnName("sessionPath");
             entity.Property(e => e.Puerto).HasColumnName("puerto");
-            entity.Property(e => e.Usuario)
-                .HasMaxLength(150)
-                .IsUnicode(false)
-                .HasColumnName("usuario");
             entity.Property(e => e.NombreDB)
                 .HasMaxLength(150)
                 .IsUnicode(false)
