@@ -1,4 +1,4 @@
-using System.IO.Compression;
+using GestionBD.Application.Abstractions.Config;
 using GestionBD.Application.Abstractions.Repositories.Command;
 using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Abstractions.Services;
@@ -12,6 +12,8 @@ using GestionBD.Domain;
 using GestionBD.Domain.Enum;
 using GestionBD.Domain.Exceptions;
 using Moq;
+using System.Collections.Generic;
+using System.IO.Compression;
 
 namespace GestionBD.UnitTests.Application.Entregables.CommandsHandlers;
 
@@ -55,7 +57,7 @@ public sealed class DesplegarEntregableCommandHandlerTests
             var instanciaReadRepositoryMock = new Mock<IInstanciaReadRepository>();
             instanciaReadRepositoryMock
                 .Setup(x => x.GetConnectionDetailsByEntregableIdAsync(entregableId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new InstanciaConnectResponse("srv", "usr", "pwd", 1433, "db", null));
+                .ReturnsAsync(new InstanciaConnectResponse("srv", "usr", 1433, "db", null));
 
             var entregableRepositoryMock = new Mock<IEntregableRepository>();
             entregableRepositoryMock
@@ -66,6 +68,14 @@ public sealed class DesplegarEntregableCommandHandlerTests
                 .ReturnsAsync(true);
 
             var unitOfWorkMock = new Mock<IUnitOfWork>();
+            var keyVaultProvider = new Mock<IVaultConfigurationProvider>();
+            keyVaultProvider
+                .Setup(x => x.GetSecretsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Dictionary<string, object>
+                {
+                    ["user"] = "usr",
+                    ["pass"] = "pwd"
+                });
             unitOfWorkMock.SetupGet(x => x.Entregables).Returns(entregableRepositoryMock.Object);
 
             var deploymentService = new EntregableDeploymentService(
@@ -74,7 +84,8 @@ public sealed class DesplegarEntregableCommandHandlerTests
                 Mock.Of<IScriptExecutor>(),
                 Mock.Of<IDacpacService>(),
                 instanciaReadRepositoryMock.Object,
-                unitOfWorkMock.Object);
+                unitOfWorkMock.Object,
+                keyVaultProvider.Object);
 
             var deployLogMock = new Mock<IDeployLog>();
             deployLogMock
@@ -106,14 +117,15 @@ public sealed class DesplegarEntregableCommandHandlerTests
         entregableReadRepositoryMock
             .Setup(x => x.GetByIdAsync(It.IsAny<decimal>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((EntregableResponseEstado?)null);
-
+        var keyVaultProvider = new Mock<IVaultConfigurationProvider>();
         var deploymentService = new EntregableDeploymentService(
             entregableReadRepositoryMock.Object,
             Mock.Of<IArtefactoReadRepository>(),
             Mock.Of<IScriptExecutor>(),
             Mock.Of<IDacpacService>(),
             Mock.Of<IInstanciaReadRepository>(),
-            Mock.Of<IUnitOfWork>());
+            Mock.Of<IUnitOfWork>(),
+            keyVaultProvider.Object);
 
         var handler = new DesplegarEntregableCommandHandler(
             deploymentService,

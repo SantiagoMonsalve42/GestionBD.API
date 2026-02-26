@@ -130,8 +130,7 @@ public sealed class EntregableRepositoryTests
         {
             IdInstancia = 1m,
             Instancia = "Instancia",
-            Usuario = "usuario",
-            Password = "password",
+            SessionPath = "usuario",
             IdMotor = motor.IdMotor,
             Puerto = 1433,
             NombreDB = "db",

@@ -1,4 +1,4 @@
-using System.IO.Compression;
+using GestionBD.Application.Abstractions.Config;
 using GestionBD.Application.Abstractions.Repositories.Command;
 using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Abstractions.Services;
@@ -12,6 +12,7 @@ using GestionBD.Domain.Enum;
 using GestionBD.Domain.Services;
 using GestionBD.Domain.ValueObjects;
 using Moq;
+using System.IO.Compression;
 
 namespace GestionBD.UnitTests.Application.Entregables.CommandsHandlers;
 
@@ -55,7 +56,7 @@ public sealed class GenerateRollbackCommandHandlerTests
             var instanciaReadRepositoryMock = new Mock<IInstanciaReadRepository>();
             instanciaReadRepositoryMock
                 .Setup(x => x.GetConnectionDetailsByEntregableIdAsync(entregableId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new InstanciaConnectResponse("srv", "usr", "pwd", 1433, "db", null));
+                .ReturnsAsync(new InstanciaConnectResponse("srv", "usr", 1433, "db", null));
 
             var scriptRegexServiceMock = new Mock<IScriptRegexService>();
             scriptRegexServiceMock.Setup(x => x.getRelatedObjects(It.IsAny<string>())).Returns([]);
@@ -79,6 +80,7 @@ public sealed class GenerateRollbackCommandHandlerTests
                 .ReturnsAsync(true);
 
             var unitOfWorkMock = new Mock<IUnitOfWork>();
+            var keyVaultProvider = new Mock<IVaultConfigurationProvider>();
             unitOfWorkMock.SetupGet(x => x.Entregables).Returns(entregableRepositoryMock.Object);
 
             var handler = new GenerateRollbackCommandHandler(
@@ -89,7 +91,8 @@ public sealed class GenerateRollbackCommandHandlerTests
                 instanciaReadRepositoryMock.Object,
                 rollbackGenerationServiceMock.Object,
                 rollbackServiceMock.Object,
-                unitOfWorkMock.Object);
+                unitOfWorkMock.Object,
+                keyVaultProvider.Object);
 
             var result = await handler.Handle(new GenerateRollbackCommand(entregableId), CancellationToken.None);
 
@@ -112,7 +115,7 @@ public sealed class GenerateRollbackCommandHandlerTests
             .ReturnsAsync((EntregableResponseEstado?)null);
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
-
+        var keyVaultProvider = new Mock<IVaultConfigurationProvider>();
         var handler = new GenerateRollbackCommandHandler(
             Mock.Of<IScriptRegexService>(),
             entregableReadRepositoryMock.Object,
@@ -121,7 +124,8 @@ public sealed class GenerateRollbackCommandHandlerTests
             Mock.Of<IInstanciaReadRepository>(),
             Mock.Of<IRollbackGenerationService>(),
             Mock.Of<IRollbackService>(),
-            unitOfWorkMock.Object);
+            unitOfWorkMock.Object,
+            keyVaultProvider.Object);
 
         var result = await handler.Handle(new GenerateRollbackCommand(1m), CancellationToken.None);
 

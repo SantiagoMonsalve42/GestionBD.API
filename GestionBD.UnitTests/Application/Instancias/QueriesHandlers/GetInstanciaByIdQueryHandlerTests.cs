@@ -11,7 +11,7 @@ public sealed class GetInstanciaByIdQueryHandlerTests
     [Fact]
     public async Task Handle_RepositoryReturnsItem_ReturnsItem()
     {
-        var expected = new InstanciaResponse(1m, 1m, "srv", 1433, "usr", "db");
+        var expected = new InstanciaResponse(1m, 1m, "srv", 1433, "db");
 
         var repositoryMock = new Mock<IInstanciaReadRepository>();
         repositoryMock

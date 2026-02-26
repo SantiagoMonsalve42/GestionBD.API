@@ -29,7 +29,7 @@ public sealed class InstanciasControllerTests
         var mediator = new TestMediator();
         mediator.Register<GetAllInstanciasQuery, IEnumerable<InstanciaResponse>>(_ =>
         [
-            new InstanciaResponse(1, 1, "instancia", 1433, "user", "db")
+            new InstanciaResponse(1, 1, "instancia", 1433, "db")
         ]);
 
         var controller = new InstanciasController(mediator);

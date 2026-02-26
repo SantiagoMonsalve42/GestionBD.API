@@ -1,4 +1,4 @@
-using System.IO.Compression;
+using GestionBD.Application.Abstractions.Config;
 using GestionBD.Application.Abstractions.Repositories.Command;
 using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Abstractions.Services;
@@ -11,6 +11,7 @@ using GestionBD.Domain;
 using GestionBD.Domain.Enum;
 using GestionBD.Domain.Exceptions;
 using Moq;
+using System.IO.Compression;
 
 namespace GestionBD.UnitTests.Application.Entregables.CommandsHandlers;
 
@@ -57,6 +58,7 @@ public sealed class DesplegarEntregableEfimeroCommandHandlerTests
                 .ReturnsAsync(true);
 
             var unitOfWorkMock = new Mock<IUnitOfWork>();
+            var keyVaultProvider = new Mock<IVaultConfigurationProvider>();
             unitOfWorkMock.SetupGet(x => x.Entregables).Returns(entregableRepositoryMock.Object);
 
             var deploymentService = new EntregableDeploymentService(
@@ -65,7 +67,8 @@ public sealed class DesplegarEntregableEfimeroCommandHandlerTests
                 Mock.Of<IScriptExecutor>(),
                 Mock.Of<IDacpacService>(),
                 Mock.Of<IInstanciaReadRepository>(),
-                unitOfWorkMock.Object);
+                unitOfWorkMock.Object,
+                keyVaultProvider.Object);
 
             var handler = new DesplegarEntregableEfimeroCommandHandler(deploymentService);
 
@@ -85,6 +88,7 @@ public sealed class DesplegarEntregableEfimeroCommandHandlerTests
     public async Task Handle_MissingTemporaryDatabase_ThrowsValidationException()
     {
         var entregableReadRepositoryMock = new Mock<IEntregableReadRepository>();
+        var keyVaultProvider = new Mock<IVaultConfigurationProvider>();
         entregableReadRepositoryMock
             .Setup(x => x.GetByIdAsync(It.IsAny<decimal>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new EntregableResponseEstado(
@@ -106,7 +110,8 @@ public sealed class DesplegarEntregableEfimeroCommandHandlerTests
             Mock.Of<IScriptExecutor>(),
             Mock.Of<IDacpacService>(),
             Mock.Of<IInstanciaReadRepository>(),
-            Mock.Of<IUnitOfWork>());
+            Mock.Of<IUnitOfWork>(),
+            keyVaultProvider.Object);
 
         var handler = new DesplegarEntregableEfimeroCommandHandler(deploymentService);
 

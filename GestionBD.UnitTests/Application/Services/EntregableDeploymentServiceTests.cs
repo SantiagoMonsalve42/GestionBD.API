@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using GestionBD.Application.Abstractions.Config;
 using GestionBD.Application.Abstractions.Repositories.Command;
 using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Abstractions.Services;
@@ -41,6 +42,7 @@ public sealed class EntregableDeploymentServiceTests
             };
 
             var entregableReadRepositoryMock = new Mock<IEntregableReadRepository>();
+            var keyVaultProvider = new Mock<IVaultConfigurationProvider>();
             entregableReadRepositoryMock
                 .Setup(x => x.GetByIdAsync(entregableId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(entregable);
@@ -66,7 +68,8 @@ public sealed class EntregableDeploymentServiceTests
                 scriptExecutorMock.Object,
                 Mock.Of<IDacpacService>(),
                 Mock.Of<IInstanciaReadRepository>(),
-                unitOfWorkMock.Object);
+                unitOfWorkMock.Object,
+                keyVaultProvider.Object);
 
             var results = (await service.PreDeployAsync(entregableId, CancellationToken.None)).ToList();
 
@@ -101,6 +104,7 @@ public sealed class EntregableDeploymentServiceTests
                 null);
 
             var entregableReadRepositoryMock = new Mock<IEntregableReadRepository>();
+            var keyVaultProvider = new Mock<IVaultConfigurationProvider>();
             entregableReadRepositoryMock
                 .Setup(x => x.GetByIdAsync(1m, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(entregable);
@@ -113,7 +117,8 @@ public sealed class EntregableDeploymentServiceTests
                 Mock.Of<IScriptExecutor>(),
                 Mock.Of<IDacpacService>(),
                 Mock.Of<IInstanciaReadRepository>(),
-                unitOfWorkMock.Object);
+                unitOfWorkMock.Object,
+                keyVaultProvider.Object);
 
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 service.PreDeployAsync(1m, CancellationToken.None));
@@ -176,6 +181,7 @@ public sealed class EntregableDeploymentServiceTests
                 .ReturnsAsync(true);
 
             var unitOfWorkMock = new Mock<IUnitOfWork>();
+            var keyVaultProvider = new Mock<IVaultConfigurationProvider>();
             unitOfWorkMock.SetupGet(x => x.Entregables).Returns(entregableRepositoryMock.Object);
 
             var service = new EntregableDeploymentService(
@@ -184,7 +190,8 @@ public sealed class EntregableDeploymentServiceTests
                 scriptExecutorMock.Object,
                 dacpacServiceMock.Object,
                 Mock.Of<IInstanciaReadRepository>(),
-                unitOfWorkMock.Object);
+                unitOfWorkMock.Object,
+                keyVaultProvider.Object);
 
             var results = (await service.PreDeployAsync(entregableId, CancellationToken.None)).ToList();
 
@@ -238,7 +245,7 @@ public sealed class EntregableDeploymentServiceTests
             var instanciaReadRepositoryMock = new Mock<IInstanciaReadRepository>();
             instanciaReadRepositoryMock
                 .Setup(x => x.GetConnectionDetailsByEntregableIdAsync(entregableId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new InstanciaConnectResponse("srv", "usr", "pwd", 1433, "db", null));
+                .ReturnsAsync(new InstanciaConnectResponse("srv", "usr", 1433, "db", null));
 
             var scriptExecutorMock = new Mock<IScriptExecutor>();
 
@@ -248,6 +255,14 @@ public sealed class EntregableDeploymentServiceTests
                 .ReturnsAsync(true);
 
             var unitOfWorkMock = new Mock<IUnitOfWork>();
+            var keyVaultProvider = new Mock<IVaultConfigurationProvider>();
+            keyVaultProvider
+                .Setup(x => x.GetSecretsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Dictionary<string, object>
+                {
+                    ["user"] = "usr",
+                    ["pass"] = "pwd"
+                });
             unitOfWorkMock.SetupGet(x => x.Entregables).Returns(entregableRepositoryMock.Object);
 
             var service = new EntregableDeploymentService(
@@ -256,7 +271,8 @@ public sealed class EntregableDeploymentServiceTests
                 scriptExecutorMock.Object,
                 Mock.Of<IDacpacService>(),
                 instanciaReadRepositoryMock.Object,
-                unitOfWorkMock.Object);
+                unitOfWorkMock.Object,
+                keyVaultProvider.Object);
 
             var results = (await service.DeployAsync(entregableId, CancellationToken.None)).ToList();
 
@@ -301,14 +317,15 @@ public sealed class EntregableDeploymentServiceTests
                 .ReturnsAsync((InstanciaConnectResponse?)null);
 
             var unitOfWorkMock = new Mock<IUnitOfWork>();
-
+            var keyVaultProvider = new Mock<IVaultConfigurationProvider>();
             var service = new EntregableDeploymentService(
                 entregableReadRepositoryMock.Object,
                 Mock.Of<IArtefactoReadRepository>(),
                 Mock.Of<IScriptExecutor>(),
                 Mock.Of<IDacpacService>(),
                 instanciaReadRepositoryMock.Object,
-                unitOfWorkMock.Object);
+                unitOfWorkMock.Object,
+                keyVaultProvider.Object);
 
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 service.DeployAsync(1m, CancellationToken.None));
