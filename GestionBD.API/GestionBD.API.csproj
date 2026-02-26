@@ -19,8 +19,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GestionBD.Application\GestionBD.Application.csproj" />
-    <ProjectReference Include="..\GestionBD.Infraestructure.ExternalServices\GestionBD.Infraestructure.ExternalServices.csproj" />
-    <ProjectReference Include="..\GestionBD.Infraestructure\GestionBD.Infraestructure.csproj" />
+    <ProjectReference Include="..\GestionBD.Infrastructure.ExternalServices\GestionBD.Infrastructure.ExternalServices.csproj" />
+    <ProjectReference Include="..\GestionBD.Infrastructure\GestionBD.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

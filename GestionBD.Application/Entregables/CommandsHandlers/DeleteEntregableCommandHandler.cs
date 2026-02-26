@@ -10,7 +10,7 @@ public sealed class DeleteEntregableCommandHandler : IRequestHandler<DeleteEntre
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IFileStorageService _fileStorageService;
-    public DeleteEntregableCommandHandler(IUnitOfWork unitOfWork,IFileStorageService fileStorageService)
+    public DeleteEntregableCommandHandler(IUnitOfWork unitOfWork, IFileStorageService fileStorageService)
     {
         _unitOfWork = unitOfWork;
         _fileStorageService = fileStorageService;
@@ -19,9 +19,9 @@ public sealed class DeleteEntregableCommandHandler : IRequestHandler<DeleteEntre
     public async Task<Unit> Handle(DeleteEntregableCommand command, CancellationToken cancellationToken)
     {
         var entregable = await _unitOfWork.FindEntityAsync<TblEntregable>(command.IdEntregable, cancellationToken);
-        if (entregable?.RutaEntregable != null) 
+        if (entregable?.RutaEntregable != null)
             await _fileStorageService.DeleteFileAsync(entregable.RutaEntregable);
-        
+
         if (entregable == null)
             throw new KeyNotFoundException($"Entregable con ID {command.IdEntregable} no encontrado.");
 

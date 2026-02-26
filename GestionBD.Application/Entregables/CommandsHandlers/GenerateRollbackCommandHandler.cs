@@ -1,4 +1,5 @@
-﻿using GestionBD.Application.Abstractions.Repositories.Query;
+﻿using GestionBD.Application.Abstractions.Config;
+using GestionBD.Application.Abstractions.Repositories.Query;
 using GestionBD.Application.Abstractions.Services;
 using GestionBD.Application.Contracts.Instancias;
 using GestionBD.Application.Entregables.Commands;
@@ -6,7 +7,6 @@ using GestionBD.Domain;
 using GestionBD.Domain.Services;
 using GestionBD.Domain.ValueObjects;
 using MediatR;
-using System.Collections.Generic;
 using System.Text;
 
 namespace GestionBD.Application.Entregables.CommandsHandlers
@@ -21,6 +21,7 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
         private readonly IRollbackGenerationService _rollbackScriptGeneratorService;
         private readonly IRollbackService _rollbackService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IVaultConfigurationProvider _vaultConfigurationProvider;
         public GenerateRollbackCommandHandler(IScriptRegexService scriptRegexService,
                                               IEntregableReadRepository entregableReadRepository,
                                               IArtefactoReadRepository artefactoReadRepository,
@@ -28,7 +29,8 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
                                               IInstanciaReadRepository instanciaReadRepository,
                                               IRollbackGenerationService rollbackScriptGeneratorService,
                                               IRollbackService rollbackService,
-                                              IUnitOfWork unitOfWork)
+                                              IUnitOfWork unitOfWork,
+                                              IVaultConfigurationProvider vaultConfigurationProvider)
         {
             _scriptRegexService = scriptRegexService;
             _entregableReadRepository = entregableReadRepository;
@@ -38,14 +40,15 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
             _instanciaReadRepository = instanciaReadRepository;
             _rollbackService = rollbackService;
             _unitOfWork = unitOfWork;
+            _vaultConfigurationProvider = vaultConfigurationProvider;   
         }
         public async Task<string?> Handle(GenerateRollbackCommand request, CancellationToken cancellationToken)
         {
-            
+
             try
             {
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
-                var entregable = await _entregableReadRepository.GetByIdAsync(request.idEntregable,cancellationToken);
+                var entregable = await _entregableReadRepository.GetByIdAsync(request.idEntregable, cancellationToken);
 
                 if (entregable == null)
                     throw new InvalidOperationException(
@@ -101,12 +104,12 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
         private async Task<string> getRelatedObjects(ScriptDeployment script, InstanciaConnectResponse instanciaConnectResponse)
         {
             var objectsInScript = _scriptRegexService.getRelatedObjects(script.ScriptContent);
-            
+            var vaultPath = await _vaultConfigurationProvider.GetSecretsAsync(instanciaConnectResponse.SessionPath);
             if (!objectsInScript.Any())
                 return string.Empty;
-            
+
             using var semaphore = new SemaphoreSlim(Environment.ProcessorCount, Environment.ProcessorCount);
-            
+
             var tasks = objectsInScript.Select(async objectScript =>
             {
                 await semaphore.WaitAsync();
@@ -115,8 +118,8 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
                     return await _databaseService.getObjectDefinition(
                         $"{instanciaConnectResponse.Instancia},{instanciaConnectResponse.Puerto}",
                         instanciaConnectResponse.NombreBD,
-                        instanciaConnectResponse.Usuario,
-                        instanciaConnectResponse.Password, 
+                        vaultPath["user"].ToString() ?? "",
+                        vaultPath["pass"].ToString() ?? "",
                         objectScript);
                 }
                 finally
@@ -124,9 +127,9 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
                     semaphore.Release();
                 }
             });
-            
+
             var relatedObjects = await Task.WhenAll(tasks);
-            
+
             return scriptListToContext(relatedObjects.Where(x => !string.IsNullOrEmpty(x)).ToList());
         }
         private string scriptListToContext(List<string> objectDefinitions)
@@ -138,7 +141,7 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
                 stringBuilder.AppendLine($"{index}. {definition} | ");
                 index++;
             }
-            return stringBuilder.ToString();    
+            return stringBuilder.ToString();
         }
         private async Task<RollbackGeneration> generateRollbackServiceScript(string newObjectsDefinitions,
                                             string currentObjectsDefinitions)
@@ -146,6 +149,6 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
             return await _rollbackScriptGeneratorService
                             .GenerateRollbackAsync(newObjectsDefinitions, currentObjectsDefinitions);
         }
-        
+
     }
 }

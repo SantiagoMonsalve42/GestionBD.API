@@ -2,9 +2,9 @@
 
 public enum EstadoEntregaEnum
 {
-    Creado =1,
+    Creado = 1,
     Preparacion = 2,
-    Analisis=3,
+    Analisis = 3,
     PreDespliegue = 4,
     Rollback = 5,
     Despliegue = 6,

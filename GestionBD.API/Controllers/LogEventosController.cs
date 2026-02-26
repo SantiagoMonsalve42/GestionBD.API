@@ -54,7 +54,7 @@ public sealed class LogEventosController : ControllerBase
     public async Task<IActionResult> GetById(decimal id)
     {
         var logEvento = await _mediator.Send(new GetLogEventoByIdQuery(id));
-        
+
         if (logEvento == null)
             return NotFound(new { message = $"Log de evento con ID {id} no encontrado." });
 

@@ -54,7 +54,7 @@ public sealed class LogTransaccionesController : ControllerBase
     public async Task<IActionResult> GetById(decimal id)
     {
         var logTransaccion = await _mediator.Send(new GetLogTransaccionByIdQuery(id));
-        
+
         if (logTransaccion == null)
             return NotFound(new { message = $"Log de transacción con ID {id} no encontrado." });
 

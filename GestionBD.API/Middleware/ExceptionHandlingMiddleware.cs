@@ -38,10 +38,10 @@ public class ExceptionHandlingMiddleware
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         var traceId = context.TraceIdentifier;
-        
-        _logger.LogError(exception, 
-            "Error no controlado. TraceId: {TraceId}, Path: {Path}", 
-            traceId, 
+
+        _logger.LogError(exception,
+            "Error no controlado. TraceId: {TraceId}, Path: {Path}",
+            traceId,
             context.Request.Path);
 
         var errorResponse = exception switch
@@ -74,7 +74,7 @@ public class ExceptionHandlingMiddleware
                 forbiddenEx.Message,
                 traceId),
 
-           
+
 
             DbUpdateException dbUpdateEx => HandleDbUpdateException(dbUpdateEx, traceId),
 

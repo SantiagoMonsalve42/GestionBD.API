@@ -1,7 +1,7 @@
-using MediatR;
+using GestionBD.Application.Ejecuciones.Commands;
 using GestionBD.Domain;
 using GestionBD.Domain.Entities;
-using GestionBD.Application.Ejecuciones.Commands;
+using MediatR;
 
 namespace GestionBD.Application.Ejecuciones.CommandsHandlers;
 

@@ -1,9 +1,9 @@
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using GestionBD.Application.Artefactos.Commands;
 using GestionBD.Application.Artefactos.Queries;
 using GestionBD.Application.Contracts.Artefactos;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GestionBD.API.Controllers;
 
@@ -53,7 +53,7 @@ public sealed class ArtefactosController : ControllerBase
     public async Task<IActionResult> GetById(decimal id)
     {
         var artefacto = await _mediator.Send(new GetArtefactoByIdQuery(id));
-        
+
         if (artefacto == null)
             return NotFound(new { message = $"Artefacto con ID {id} no encontrado." });
 

@@ -1,5 +1,5 @@
-using MediatR;
 using GestionBD.Application.Contracts.LogTransacciones;
+using MediatR;
 
 namespace GestionBD.Application.LogTransacciones.Commands;
 

@@ -1,5 +1,4 @@
-﻿using GestionBD.Application.Abstractions;
-using GestionBD.Application.Contracts.Entregables;
+﻿using GestionBD.Application.Contracts.Entregables;
 using GestionBD.Application.Entregables.Commands;
 using GestionBD.Application.Services;
 using GestionBD.Domain.Exceptions;
@@ -7,7 +6,7 @@ using MediatR;
 
 namespace GestionBD.Application.Entregables.CommandsHandlers
 {
-    public sealed class DesplegarEntregableEfimeroCommandHandler 
+    public sealed class DesplegarEntregableEfimeroCommandHandler
         : IRequestHandler<DesplegarEntregableEfimeroCommand, IEnumerable<EntregablePreValidateResponse>>
     {
         private readonly EntregableDeploymentService _deploymentService;
@@ -18,7 +17,7 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
         }
 
         public async Task<IEnumerable<EntregablePreValidateResponse>> Handle(
-                    DesplegarEntregableEfimeroCommand request, 
+                    DesplegarEntregableEfimeroCommand request,
                     CancellationToken cancellationToken)
         {
             try

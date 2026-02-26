@@ -6,7 +6,7 @@ using MediatR;
 
 namespace GestionBD.Application.Entregables.CommandsHandlers
 {
-    public sealed class EntregableToCerradoCommandHandler: IRequestHandler<EntregableToCerradoCommand, Unit>
+    public sealed class EntregableToCerradoCommandHandler : IRequestHandler<EntregableToCerradoCommand, Unit>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IEntregableReadRepository _entregableReadRepository;
@@ -45,12 +45,12 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
                 }
                 await _unitOfWork.CommitTransactionAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync();
                 throw new Exception($"Error al actualizar el estado del entregable: {ex.Message}");
             }
-            
+
             return Unit.Value;
         }
     }

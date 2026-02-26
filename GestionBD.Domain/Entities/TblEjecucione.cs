@@ -1,6 +1,4 @@
-﻿using GestionBD.Domain.Exceptions;
-
-namespace GestionBD.Domain.Entities;
+﻿namespace GestionBD.Domain.Entities;
 
 public partial class TblEjecucione
 {
@@ -18,5 +16,5 @@ public partial class TblEjecucione
     public virtual TblInstancia IdInstanciaNavigation { get; set; } = null!;
 
     public virtual ICollection<TblEntregable> TblEntregables { get; set; } = new List<TblEntregable>();
-   
+
 }

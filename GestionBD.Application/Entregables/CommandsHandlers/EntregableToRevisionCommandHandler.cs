@@ -9,7 +9,7 @@ namespace GestionBD.Application.Entregables.CommandsHandlers
         private readonly IUnitOfWork _unitOfWork;
         public EntregableToRevisionCommandHandler(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = unitOfWork;   
+            _unitOfWork = unitOfWork;
         }
         public async Task<Unit> Handle(EntregableToRevisionCommand request, CancellationToken cancellationToken)
         {
