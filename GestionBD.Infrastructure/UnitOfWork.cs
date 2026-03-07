@@ -17,7 +17,6 @@ public sealed class UnitOfWork : IUnitOfWork
     private IEntregableRepository? _entregables;
     private IArtefactoRepository? _artefactos;
     private ILogTransaccionRepository? _logTransacciones;
-    private ILogEventoRepository? _logEventos;
     private IParametroRepository? _parametros;
 
     public UnitOfWork(ApplicationDbContext context)
@@ -31,7 +30,6 @@ public sealed class UnitOfWork : IUnitOfWork
     public IEntregableRepository Entregables => _entregables ??= new EntregableRepository(_context);
     public IArtefactoRepository Artefactos => _artefactos ??= new ArtefactoRepository(_context);
     public ILogTransaccionRepository LogTransacciones => _logTransacciones ??= new LogTransaccionRepository(_context);
-    public ILogEventoRepository LogEventos => _logEventos ??= new LogEventoRepository(_context);
     public IParametroRepository Parametros => _parametros ??= new ParametroRepository(_context);
 
     public async Task<TEntity?> FindEntityAsync<TEntity>(decimal id, CancellationToken cancellationToken = default) where TEntity : class

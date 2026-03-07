@@ -18,7 +18,6 @@ public partial class ApplicationDbContext : DbContext
     public virtual DbSet<TblEjecucione> TblEjecuciones { get; set; }
     public virtual DbSet<TblEntregable> TblEntregables { get; set; }
     public virtual DbSet<TblInstancia> TblInstancias { get; set; }
-    public virtual DbSet<TblLogEvento> TblLogEventos { get; set; }
     public virtual DbSet<TblLogTransaccione> TblLogTransacciones { get; set; }
     public virtual DbSet<TblMotore> TblMotores { get; set; }
     public virtual DbSet<TblParametro> TblParametros { get; set; }
@@ -177,34 +176,6 @@ public partial class ApplicationDbContext : DbContext
                 .HasForeignKey(d => d.IdMotor)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_tbl_Instancias_tbl_Motores");
-        });
-
-        modelBuilder.Entity<TblLogEvento>(entity =>
-        {
-            entity.HasKey(e => e.IdEvento);
-            entity.ToTable("tbl_logEventos");
-
-            entity.Property(e => e.IdEvento)
-                .ValueGeneratedOnAdd()
-                .HasColumnType("numeric(18, 0)")
-                .HasColumnName("idEvento");
-            entity.Property(e => e.Descripcion)
-                .HasMaxLength(500)
-                .HasColumnName("descripcion");
-            entity.Property(e => e.EstadoEvento)
-                .HasMaxLength(500)
-                .HasColumnName("estadoEvento");
-            entity.Property(e => e.FechaEjecucion)
-                .HasColumnType("datetime")
-                .HasColumnName("fechaEjecucion");
-            entity.Property(e => e.IdTransaccion)
-                .HasColumnType("numeric(18, 0)")
-                .HasColumnName("idTransaccion");
-
-            entity.HasOne(d => d.IdTransaccionNavigation).WithMany(p => p.TblLogEventos)
-                .HasForeignKey(d => d.IdTransaccion)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_tbl_logEventos_tbl_logTransacciones");
         });
 
         modelBuilder.Entity<TblLogTransaccione>(entity =>
