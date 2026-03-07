@@ -18,5 +18,4 @@ public partial class TblLogTransaccione
 
     public string UsuarioEjecucion { get; set; } = null!;
 
-    public virtual ICollection<TblLogEvento> TblLogEventos { get; set; } = new List<TblLogEvento>();
 }

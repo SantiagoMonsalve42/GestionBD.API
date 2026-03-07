@@ -12,7 +12,6 @@ public interface IUnitOfWork : IDisposable
     IEntregableRepository Entregables { get; }
     IArtefactoRepository Artefactos { get; }
     ILogTransaccionRepository LogTransacciones { get; }
-    ILogEventoRepository LogEventos { get; }
     IParametroRepository Parametros { get; }
 
     Task<TEntity?> FindEntityAsync<TEntity>(decimal id, CancellationToken cancellationToken = default) where TEntity : class;

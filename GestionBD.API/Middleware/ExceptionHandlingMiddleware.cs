@@ -1,8 +1,11 @@
 using GestionBD.API.Models;
+using GestionBD.Application.Abstractions.Services;
 using GestionBD.Domain.Exceptions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace GestionBD.API.Middleware;
@@ -23,19 +26,73 @@ public class ExceptionHandlingMiddleware
         _environment = environment;
     }
 
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context, ILoggerAuditService loggerAuditService)
     {
+        var userId = GetUserIdFromAuthorizationHeader(context);
+
+        decimal logId = await loggerAuditService.LogAudit(
+            userId: userId,
+            action: $"{context.Request.Method} {context.Request.Path}",
+            description: $"{context.Request.Method} {context.Request.Path}");
+
         try
         {
             await _next(context);
+
+            var successJson = JsonSerializer.Serialize(new
+            {
+                message = "Solicitud procesada correctamente."
+            });
+
+            var responseAudit = $"{context.Response.StatusCode} - {successJson}";
+            await loggerAuditService.UpdateLogAudit(logId, responseAudit, "S");
         }
         catch (Exception ex)
         {
-            await HandleExceptionAsync(context, ex);
+            var errorAudit = await HandleExceptionAsync(context, ex);
+            await loggerAuditService.UpdateLogAudit(logId, errorAudit, "F");
         }
     }
 
-    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private static string GetUserIdFromAuthorizationHeader(HttpContext context)
+    {
+        if (!context.Request.Headers.TryGetValue("Authorization", out var authorizationHeader))
+        {
+            return "Anonymous";
+        }
+
+        var authorizationValue = authorizationHeader.ToString();
+        if (!authorizationValue.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Anonymous";
+        }
+
+        var token = authorizationValue["Bearer ".Length..].Trim();
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            return "Anonymous";
+        }
+
+        try
+        {
+            var handler = new JwtSecurityTokenHandler();
+            if (!handler.CanReadToken(token))
+            {
+                return "Anonymous";
+            }
+
+            var jwtToken = handler.ReadJwtToken(token);
+
+            return jwtToken.Claims.FirstOrDefault(c => c.Type == "email")?.Value
+                ?? "Anonymous";
+        }
+        catch
+        {
+            return "Anonymous";
+        }
+    }
+
+    private async Task<string> HandleExceptionAsync(HttpContext context, Exception exception)
     {
         var traceId = context.TraceIdentifier;
 
@@ -74,8 +131,6 @@ public class ExceptionHandlingMiddleware
                 forbiddenEx.Message,
                 traceId),
 
-
-
             DbUpdateException dbUpdateEx => HandleDbUpdateException(dbUpdateEx, traceId),
 
             InvalidOperationException invalidOpEx => CreateErrorResponse(
@@ -94,7 +149,6 @@ public class ExceptionHandlingMiddleware
                 traceId)
         };
 
-        // Agregar detalles técnicos solo en desarrollo
         if (_environment.IsDevelopment() && errorResponse.StatusCode == 500)
         {
             errorResponse.Details = exception.ToString();
@@ -109,7 +163,10 @@ public class ExceptionHandlingMiddleware
             WriteIndented = _environment.IsDevelopment()
         };
 
-        await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse, options));
+        var serialized = JsonSerializer.Serialize(errorResponse, options);
+        await context.Response.WriteAsync(serialized);
+
+        return $"{errorResponse.StatusCode} - {serialized}";
     }
 
     private ErrorResponse CreateErrorResponse(
