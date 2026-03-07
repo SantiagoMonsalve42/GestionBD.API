@@ -1,5 +1,6 @@
 using GestionBD.API.Middleware;
 using GestionBD.API.Models;
+using GestionBD.Application.Abstractions.Services;
 using GestionBD.Domain.Exceptions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -25,8 +26,9 @@ public sealed class ExceptionHandlingMiddlewareTests
         var logger = LoggerFactory.Create(builder => { }).CreateLogger<ExceptionHandlingMiddleware>();
         var environment = new TestWebHostEnvironment(Environments.Production);
         var middleware = new ExceptionHandlingMiddleware(next, logger, environment);
+        var loggerAuditService = new FakeLoggerAuditService();
 
-        await middleware.InvokeAsync(context);
+        await middleware.InvokeAsync(context, loggerAuditService);
 
         context.Response.Body.Seek(0, SeekOrigin.Begin);
         var responseBody = await new StreamReader(context.Response.Body).ReadToEndAsync();
@@ -55,8 +57,9 @@ public sealed class ExceptionHandlingMiddlewareTests
         var logger = LoggerFactory.Create(builder => { }).CreateLogger<ExceptionHandlingMiddleware>();
         var environment = new TestWebHostEnvironment(Environments.Production);
         var middleware = new ExceptionHandlingMiddleware(next, logger, environment);
+        var loggerAuditService = new FakeLoggerAuditService();
 
-        await middleware.InvokeAsync(context);
+        await middleware.InvokeAsync(context, loggerAuditService);
 
         context.Response.Body.Seek(0, SeekOrigin.Begin);
         var responseBody = await new StreamReader(context.Response.Body).ReadToEndAsync();
@@ -69,6 +72,19 @@ public sealed class ExceptionHandlingMiddlewareTests
         Assert.NotNull(response);
         Assert.Equal(StatusCodes.Status404NotFound, response.StatusCode);
         Assert.Contains("no fue encontrada", response.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private sealed class FakeLoggerAuditService : ILoggerAuditService
+    {
+        public Task<decimal> LogAudit(string userId, string action, string description)
+        {
+            return Task.FromResult(1m);
+        }
+
+        public Task UpdateLogAudit(decimal logId, string response, string status)
+        {
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class TestWebHostEnvironment : IWebHostEnvironment

@@ -1,6 +1,8 @@
 using GestionBD.API.Configuration;
 using GestionBD.API.Extensions;
 using GestionBD.Application;
+using GestionBD.Application.Abstractions.Services;
+using GestionBD.Application.Services;
 using GestionBD.Infrastructure;
 using GestionBD.Infrastructure.ExternalServices;
 
@@ -13,6 +15,7 @@ await builder.Services.AddExternalServicesAsync(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // Application
+
 builder.Services.AddApplication();
 
 // Presentation (Controllers, Swagger, CORS)
@@ -20,6 +23,9 @@ builder.Services.AddPresentation(builder.Configuration);
 
 // Autenticación con Keycloak
 builder.Services.AddKeycloakAuthentication();
+
+builder.Services.AddScoped<ILoggerAuditService, LoggerAuditService>();
+
 
 var app = builder.Build();
 

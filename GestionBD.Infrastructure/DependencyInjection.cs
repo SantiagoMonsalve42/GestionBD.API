@@ -45,7 +45,6 @@ public static class DependencyInjection
         services.AddScoped<IEjecucionReadRepository, EjecucionReadRepository>();
         services.AddScoped<IInstanciaReadRepository, InstanciaReadRepository>();
         services.AddScoped<IMotorReadRepository, MotorReadRepository>();
-        services.AddScoped<ILogEventoReadRepository, LogEventoReadRepository>();
         services.AddScoped<ILogTransaccionReadRepository, LogTransaccionReadRepository>();
         services.AddScoped<IParametroReadRepository, ParametroReadRepository>();
         services.AddScoped<IStatisticsRepository, StatisticsRepository>();

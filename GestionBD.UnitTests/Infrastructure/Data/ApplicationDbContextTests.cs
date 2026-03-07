@@ -17,7 +17,6 @@ public sealed class ApplicationDbContextTests
         Assert.NotNull(context.TblEjecuciones);
         Assert.NotNull(context.TblEntregables);
         Assert.NotNull(context.TblInstancias);
-        Assert.NotNull(context.TblLogEventos);
         Assert.NotNull(context.TblLogTransacciones);
         Assert.NotNull(context.TblMotores);
         Assert.NotNull(context.TblParametros);
