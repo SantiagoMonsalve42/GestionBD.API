@@ -7,8 +7,6 @@ namespace GestionBD.Infrastructure.Services;
 
 public sealed class DatabaseService : IDatabaseService
 {
-
-
     public async Task<string> getObjectDefinition(
         string serverName,
         string databaseName,
@@ -102,5 +100,37 @@ public sealed class DatabaseService : IDatabaseService
             3 => (parts[1], parts[2]),
             _ => throw new ArgumentException($"Formato de nombre de objeto inválido: {fullObjectName}")
         };
+    }
+
+    public async Task<bool> testConnection(string serverName, string databaseName, string user, string password)
+    {
+        if (string.IsNullOrWhiteSpace(serverName))
+            throw new ArgumentException("El nombre del servidor no puede estar vacío", nameof(serverName));
+
+        if (string.IsNullOrWhiteSpace(databaseName))
+            throw new ArgumentException("El nombre de la base de datos no puede estar vacío", nameof(databaseName));
+
+        var connectionString = SqlConnectionStringHelper.BuildConnectionString(
+            serverName,
+            databaseName,
+            user,
+            password,
+            SqlConnectionOptions.DatabaseService);
+
+        try
+        {
+            await using var connection = new SqlConnection(connectionString);
+            await connection.OpenAsync();
+
+            return connection.State == ConnectionState.Open;
+        }
+        catch (SqlException)
+        {
+            return false;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
     }
 }

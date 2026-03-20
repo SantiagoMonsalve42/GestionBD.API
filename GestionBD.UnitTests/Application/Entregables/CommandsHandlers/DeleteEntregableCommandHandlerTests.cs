@@ -24,8 +24,9 @@ public sealed class DeleteEntregableCommandHandlerTests
         unitOfWorkMock.SetupGet(x => x.Entregables).Returns(entregableRepositoryMock.Object);
 
         var fileStorageMock = new Mock<IFileStorageService>();
+        var dacpacServiceMock = new Mock<IDacpacService>();
 
-        var handler = new DeleteEntregableCommandHandler(unitOfWorkMock.Object, fileStorageMock.Object);
+        var handler = new DeleteEntregableCommandHandler(unitOfWorkMock.Object, fileStorageMock.Object, dacpacServiceMock.Object);
 
         await handler.Handle(new DeleteEntregableCommand(1m), CancellationToken.None);
 
@@ -42,7 +43,7 @@ public sealed class DeleteEntregableCommandHandlerTests
             .Setup(x => x.FindEntityAsync<TblEntregable>(It.IsAny<decimal>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((TblEntregable?)null);
 
-        var handler = new DeleteEntregableCommandHandler(unitOfWorkMock.Object, Mock.Of<IFileStorageService>());
+        var handler = new DeleteEntregableCommandHandler(unitOfWorkMock.Object, Mock.Of<IFileStorageService>(), Mock.Of<IDacpacService>());
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() =>
             handler.Handle(new DeleteEntregableCommand(1m), CancellationToken.None));

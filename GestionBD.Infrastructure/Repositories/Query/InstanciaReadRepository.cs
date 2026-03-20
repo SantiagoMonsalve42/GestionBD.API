@@ -22,7 +22,8 @@ public sealed class InstanciaReadRepository : IInstanciaReadRepository
                 i.idMotor AS IdMotor,
                 i.instancia AS Instancia,
                 i.puerto AS Puerto,
-                i.nombreBD AS NombreBD
+                i.nombreBD AS NombreBD,
+                i.sessionPath AS SessionPath
             FROM dbo.tbl_Instancias i
             ORDER BY i.instancia;
             """;
@@ -38,7 +39,8 @@ public sealed class InstanciaReadRepository : IInstanciaReadRepository
                 i.idMotor AS IdMotor,
                 i.instancia AS Instancia,
                 i.puerto AS Puerto,
-                i.nombreBD AS NombreBD
+                i.nombreBD AS NombreBD,
+                i.sessionPath AS SessionPath
             FROM dbo.tbl_Instancias i
             WHERE i.idInstancia = @Id;
             """;
