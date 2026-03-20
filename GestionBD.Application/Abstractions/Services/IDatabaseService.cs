@@ -7,5 +7,9 @@
                                                 string user,
                                                 string password,
                                                 string objectName);
+        public Task<bool> testConnection(string serverName,
+                                                string databaseName,
+                                                string user,
+                                                string password);
     }
 }

@@ -44,6 +44,16 @@ public sealed class InstanciasController : ControllerBase
         var instancias = await _mediator.Send(new GetAllInstanciasQuery());
         return Ok(instancias);
     }
+    /// <summary>
+    /// Prueba la conexión a una instancia de base de datos
+    /// </summary>
+    [HttpGet("test-connection/{id:decimal}")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    public async Task<IActionResult> TestConnection(decimal id)
+    {
+        var connectionSuccessful = await _mediator.Send(new TestConnectionCommand(id));
+        return Ok(new { connectionSuccessful });
+    }
 
     /// <summary>
     /// Obtiene una instancia por ID
